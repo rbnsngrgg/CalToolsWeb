@@ -1,32 +1,16 @@
-// server.js
-import express from 'express';
-const app = express();
+require("dotenv").config();
+const mongoose = require("mongoose");
+const CTItemSchema = require("./models/schemas/CTItemSchema");
+const app = require("./server");
+const PORT = process.env.PORT || 3001;
 
-app.get('/users', function(req, res) {
-  res.json({ users: 'allUsers' });
-
-  // Real code from my application below
-  //  model.User.findAll().then (users => {
-  //        res.status(200).json({ users });
-  //     }).catch(error=>{
-  //        console.log(error)
-  //        req.status(500).send(error)
-  //  })
+mongoose.connect("mongodb://localhost:27017/CalToolsDb", { useNewUrlParser: true , useUnifiedTopology: true, useCreateIndex: true})
+  .then(async () => {
+    //Initialize database collections on server start
+    await mongoose.connection.createCollection("ctitems", {
+      validator: {$jsonSchema: CTItemSchema}
+    });
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
 });
-
-app.get('/users/3', function(req, res) {
-  res.json({ user: 'user3' });
-
-  // Real code from my application below
-  // const { id } = req.params;
-  //    model.User.findOne({
-  //        where: { id: Number(id) }
-  //    }).then(user=>{
-  //        res.status(200).json({ user });
-  //    }).catch(error=>{
-  //        console.log(error)
-  //        req.status(500).send(error)
-  //    })
-});
-
-export const server = app;
