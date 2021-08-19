@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
+const CTTaskSchema = require("./CTTask");
 
-export const CTItemSchema = mongoose.Schema({
+const CTItemSchema = mongoose.Schema({
     organizationId: {
-        type: mongoose.SchemaTypes.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Organization",
         required: true,
     },
@@ -47,8 +48,8 @@ export const CTItemSchema = mongoose.Schema({
         type: String,
         default: ""
     },
-    tasks: [{type: mongoose.SchemaTypes.ObjectId, ref: "CTTask"}]
+    tasks: [CTTaskSchema]
 }, { timestamps: true });
 
 const CTItem = mongoose.model("CTItem", CTItemSchema);
-export default CTItem;
+module.exports = CTItem;

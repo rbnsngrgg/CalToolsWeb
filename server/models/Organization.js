@@ -16,8 +16,9 @@ export const OrganizationSchema = mongoose.Schema({
     },
     users: [{
         userId: {
-            type: mongoose.SchemaTypes.ObjectId,
-            ref: "User"
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
         },
         permissions: {
             type: Number,
@@ -26,10 +27,6 @@ export const OrganizationSchema = mongoose.Schema({
             required: true
         }
     }],
-    items: [{type: mongoose.SchemaTypes.ObjectId, ref: "CTItem"}],
-    tasks: [{type: mongoose.SchemaTypes.ObjectId, ref: "CTTask"}],
-    taskData: [{type: mongoose.SchemaTypes.ObjectId, ref: "TaskData"}],
-    standardEquipment: [{type: mongoose.SchemaTypes.ObjectId, ref: "StandardEquipment"}]
 }, { timestamps: true });
 
 const Organization = mongoose.model("Organization", OrganizationSchema);

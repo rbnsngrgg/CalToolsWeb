@@ -2,7 +2,7 @@
 const e = require("express");
 const express = require("express");
 const router = express.Router();
-import CTItem from "../models/CTItem"
+const CTItem = require("../models/CTItem");
 
 router.get("/items", async (req, res) => {
     const items = await CTItem.find();

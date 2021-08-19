@@ -1,5 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
+import {BrowserRouter as Router, Route} from 'react-router-dom';
+import Login from './components/login';
+import Register from './components/register';
 
 function App() {
   return (
@@ -9,15 +12,16 @@ function App() {
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
       </header>
+      <div>
+        <Router>
+          <div>
+            <Route exact path="/" render={() => <h1>Home route</h1>}/>
+            <Route exact path="/register" component={Register}/>
+            <Route exact path="/login" component={Login}/>
+          </div>
+        </Router>
+      </div>
     </div>
   );
 }

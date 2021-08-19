@@ -1,16 +1,7 @@
+//This document is to be embedded in the CTItem, and thus has no model to generate a collection
 const mongoose = require("mongoose");
 
-export const CTTaskSchema = mongoose.Schema({
-    organizationId: {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: "Organization",
-        required: true,
-    },
-    parentItemId: {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: "CTItem",
-        required: true,
-    },
+const CTTaskSchema = mongoose.Schema({
     title: {
         type: String,
         required: true
@@ -41,8 +32,7 @@ export const CTTaskSchema = mongoose.Schema({
     dateOverride: {
         type: Date
     },
-    taskData: [{type: mongoose.SchemaTypes.ObjectId, ref: "TaskData"}]
+    taskData: [{type: mongoose.Schema.Types.ObjectId, ref: "TaskData"}]
 }, { timestamps: true });
 
-const CTTask = mongoose.model("CTTask", TaskSchema);
-export default CTTask;
+module.exports = CTTaskSchema;
