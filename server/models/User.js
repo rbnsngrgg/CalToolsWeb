@@ -28,10 +28,6 @@ const userSchema = mongoose.Schema({
         type: String,
         default: "local"
     },
-    points: {
-        type: Number,
-        default: 50
-    },
     refreshToken: {
         type: [Session],
     },
