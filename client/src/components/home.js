@@ -1,6 +1,5 @@
 import React, { useCallback, useContext, useEffect } from "react"
 import { UserContext } from "../context/UserContext"
-import Loader from "./loader"
 
 const Home = () => {
     const [userContext, setUserContext] = useContext(UserContext)
@@ -42,28 +41,6 @@ const Home = () => {
       }
     }, [userContext.details, fetchUserDetails])    
 
-    const logoutHandler = () => {
-    fetch(process.env.REACT_APP_API_ENDPOINT + "users/logout", {
-        credentials: "include",
-        headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userContext.token}`,
-        },
-    }).then(async response => {
-        setUserContext(oldValues => {
-        return { ...oldValues, details: undefined, token: null }
-        })
-        window.localStorage.setItem("logout", Date.now())
-        })
-    }
-    const refetchHandler = () => {
-        // set details to undefined so that spinner will be displayed and
-        // fetchUserDetails will be invoked from useEffect
-        setUserContext(oldValues => {
-          return { ...oldValues, details: undefined }
-        })
-    }
-
     return (
           <div className="user-details">
             <div>
@@ -73,14 +50,10 @@ const Home = () => {
             </div>
             <h1>User details</h1>
             <h2>{userContext.details ? userContext.details.firstName : ""}</h2>
+            <h2>Due items summary</h2>
+            <h2>Current Organization</h2>
             <hr/>
             <div className="user-actions">
-              <button
-                text="Logout"
-                onClick={logoutHandler}
-                minimal
-                intent="primary"
-              >Logout</button>
             </div>
           </div>
       )

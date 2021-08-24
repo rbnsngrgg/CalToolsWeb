@@ -13,11 +13,12 @@ require("./strategies/LocalStrategy");
 require("./strategies/GoogleStrategy");
 require("./authenticate");
 const userRouter = require("./routes/userRoutes");
+const orgRouter = require("./routes/organizationRoutes");
 
 const app = express();
 
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, './public')));
 app.use(express.urlencoded({extended:true}));
 app.use(express.static(path.resolve(__dirname, "../client/build")));
 
@@ -47,6 +48,7 @@ app.use(passport.initialize());
 //Route includes
 const dataRoute = require("./routes/data")
 app.use("/users", userRouter);
+app.use("/organizations", orgRouter);
 // app.use("/data", dataRoute);
 
 
@@ -70,20 +72,8 @@ app.use("/users", userRouter);
 
 app.get("/", (req, res) => {
     if(process.env.PORT) { res.sendFile(path.resolve(__dirname, "../client/build", "index.html")); }
-    else { console.log(req); res.sendStatus(200); }
+    else { res.sendStatus(200); }
 });
-
-// app.get("/auth/google",
-//     passport.authenticate("google", { scope: ["profile", "email"] }));
-    
-app.get("/auth/google/caltoolsweb", 
-    passport.authenticate("google", { failureRedirect: "/" }),
-    function(req, res) {
-        console.log(req);
-      // Successful authentication, redirect.
-      res.redirect("/");
-});
-
     
 //Keep this at the bottom of the routes
 app.get("*", (req, res) => {

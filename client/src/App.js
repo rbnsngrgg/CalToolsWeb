@@ -1,11 +1,14 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { UserContext } from "./context/UserContext";
 import './App.css';
-import {BrowserRouter as Router, Route} from 'react-router-dom';
+import {BrowserRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import Login from './components/login';
 import Register from './components/register';
 import Home from "./components/home";
 import Loader from "./components/loader"
+import Navbar from "./components/navbar";
+import OrganizationComponent from "./components/organization";
+import NewOrganizationComponent from "./components/newOrganization";
 
 function App() {
   const [userContext, setUserContext] = useContext(UserContext)
@@ -50,19 +53,35 @@ function App() {
     }
   }, [syncLogout])  
 
-  return userContext.token === null ? (
-    <div className="App">
+  return (
+    <div className="App bg-gray-300 h-screen">
       <div>
         <Router>
-          <div>
-            <Route exact path="/" render={() => <h1>Home route</h1>}/>
+          <Navbar/>
+          {userContext.token === null ?
+          (<div>
+            <Switch>
+            <Route exact path="/"><Redirect to="/login"/></Route>
             <Route exact path="/register" component={Register}/>
             <Route exact path="/login" component={Login}/>
-          </div>
+            <Route><Redirect to="/login"/></Route>
+            </Switch>
+          </div>) : 
+            userContext.token ? 
+            (<>
+            <Switch>
+            <Route exact path="/" component={Home}/> 
+            <Route exact path="/organization" component={OrganizationComponent}/>
+            <Route exact path="/organization/new" component={NewOrganizationComponent}/>
+            <Route><Redirect to="/"/></Route>
+            </Switch>
+            </>)
+            :<Loader/>
+          }
         </Router>
       </div>
     </div>
-  ) : userContext.token ? (<Home/>) : (<Loader/>);
+  )
 }
 
 export default App;

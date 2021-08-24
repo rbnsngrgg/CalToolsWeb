@@ -8,7 +8,7 @@ Organizations always have at least one admin.
 */
 const mongoose = require("mongoose");
 
-export const OrganizationSchema = mongoose.Schema({
+const OrganizationSchema = mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -23,11 +23,11 @@ export const OrganizationSchema = mongoose.Schema({
         permissions: {
             type: Number,
             min: 0,
-            max: 2,
+            max: 3,
             required: true
         }
     }],
 }, { timestamps: true });
 
 const Organization = mongoose.model("Organization", OrganizationSchema);
-export default Organization;
+module.exports = Organization;

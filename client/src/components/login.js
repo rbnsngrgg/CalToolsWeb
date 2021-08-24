@@ -1,11 +1,11 @@
 import React, { useContext, useState } from "react"
 import { UserContext } from "../context/UserContext"
-import GoogleLogin from 'react-google-login';
 
 const Login = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState("")
     const [email, setEmail] = useState("")
+    // eslint-disable-next-line
     const [userContext, setUserContext] = useContext(UserContext)
     const [password, setPassword] = useState("")
 
@@ -24,7 +24,7 @@ const Login = () => {
             setIsSubmitting(false)
             if (!response.ok) {
               if (response.status === 400) {
-                setError("Please fill all the fields correctly!")
+                setError("Please fill all the fields  ")
               } else if (response.status === 401) {
                 setError("Invalid email and password combination.")
               } else {
@@ -42,32 +42,22 @@ const Login = () => {
             setError(genericErrorMessage)
           })
       }
-
-      const handleLogin = async googleData => {
-        console.log(googleData);
-        const res = await fetch(process.env.REACT_APP_API_ENDPOINT + "users/auth/google", {
-            method: "POST",
-            body: JSON.stringify({
-            token: googleData.tokenId
-          }),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-        const data = await res.json()
-        // store returned user somehow
-      }
+    
+    const googleLoginHandler = () => {
+      window.location.href="http://localhost:3000/users/auth/google";
+    }
 
     return (
-      <div className=" bg-gray-300">
-        <div className="container h-screen flex justify-center items-center">
-          <div className="p-8 bg-white rounded-lg max-w-6xl pb-10">
-            <div className="flex justify-center mb-4"> <img src="https://i.imgur.com/f6Tb5U1.png" width="70"/> </div>
+      <div className=" bg-gray-300 flex justify-center items-center">
+        <div className="container h-screen flex justify-center items-start">
+          <div className="p-8 bg-white rounded-lg max-w-6xl pb-10 mt-20">
+            <div className="flex justify-center mb-4"> <img alt="CalTools logo" src="http://localhost:3000/images/CalToolsIcon.png" width="70"/> </div>
             <form className="auth-form" onSubmit={formSubmitHandler}>
               <input id="email" type="email" value={email} className="h-12 rounded w-full border px-3 focus:text-black focus:border-blue-100" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
               <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} className="h-12 mt-3 rounded w-full border px-3 focus:text-black focus:border-blue-100" placeholder="Password"/>
-              <div className="flex justify-end items-center mt-2"> <a href="#" className="text-gray-400 hover:text-gray-600">Forgot password?</a> </div>
-              <button intent="primary" type="submit" disabled={isSubmitting} className="uppercase h-12 mt-3 text-white w-full rounded bg-red-700 hover:bg-red-800">
+              {error !== "" && <label className="text-red-500	">{error}</label> }
+              <div className="flex justify-end items-center mt-2"> <a className="text-gray-400 hover:text-gray-600">Forgot password?</a> </div>
+              <button intent="primary" type="submit" disabled={isSubmitting} className="uppercase h-12 mt-3 text-white w-full rounded bg-gray-700 hover:bg-gray-800">
                 {`${isSubmitting ? "Logging In" : "Log In"}`}
               </button>
             </form>
@@ -75,14 +65,7 @@ const Login = () => {
               <hr className="w-full"/> <span className="p-2 text-gray-400 mb-1">OR</span>
               <hr className="w-full"/>
             </div>
-            {/* <button className="uppercase h-12 mt-3 text-white w-full rounded bg-red-800 hover:bg-red-900" onClick={googleLoginHandler}><i className="fa fa-google mr-2"></i>Google</button> */}
-            <GoogleLogin
-              clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-              buttonText="Log in with Google"
-              onSuccess={handleLogin}
-              onFailure={handleLogin}
-              cookiePolicy={'single_host_origin'}
-            />
+            <button className="uppercase h-12 mt-3 text-white w-full rounded bg-gray-800 hover:bg-gray-900" onClick={googleLoginHandler}><i className="fa fa-google mr-2"></i>Google</button>
           </div>
         </div>
       </div>

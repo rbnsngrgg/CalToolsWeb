@@ -32,6 +32,10 @@ const userSchema = mongoose.Schema({
         type: [Session],
     },
     organizations: [{type: mongoose.Schema.Types.ObjectId, ref: "Organization"}],
+    invitations: [{
+        organization: {type: mongoose.Schema.Types.ObjectId, ref: "Organization", required: true},
+        permissions: {type: Number, required: true}
+    }]
 }, { timestamps: true });
 
 userSchema.set("toJSON", {

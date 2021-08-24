@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const Organization = require("../models/Organization");
 const { getToken, COOKIE_OPTIONS, getRefreshToken, verifyUser } = require("../authenticate");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
@@ -63,37 +64,33 @@ router.post("/login", passport.authenticate("local"), (req, res, next) => {
   });
 
 router.get("/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] }, () => console.log("Google login"))
+  passport.authenticate("google", { scope: ["profile", "email"] })
 );
-router.post("/auth/google", async (req, res) => {
-  console.log("post");
-  console.log(req.body);
+
+router.get("/auth/google/caltoolsweb", 
+    passport.authenticate("google", { failureRedirect: "/" }),
+    function(req, res) {
+      // Successful authentication, redirect.
+      const token = getToken({ _id: req.user._id })
+      const refreshToken = getRefreshToken({ _id: req.user._id })
+      User.findById(req.user._id).then(
+        user => {
+          user.refreshToken.push({ refreshToken })
+          user.save((err, user) => {
+            if (err) {
+              res.statusCode = 500
+              res.send(err)
+            } else {
+              res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
+              res.set("aToken", token);
+              res.redirect("/");
+            }
+          })
+        },
+        err => next(err)
+      )
 });
-router.post("/auth/google/caltoolsweb", 
-  passport.authenticate("google", { failureRedirect: "/" }),
-  function(req, res) {
-    console.log("Successful google auth");
-    // Successful authentication, redirect.
-    // const token = getToken({ _id: req.user._id })
-    // const refreshToken = getRefreshToken({ _id: req.user._id })
-    // User.findById(req.user._id).then(
-    //   user => {
-    //     user.refreshToken.push({ refreshToken })
-    //     user.save((err, user) => {
-    //       if (err) {
-    //         res.statusCode = 500
-    //         res.send(err)
-    //       } else {
-    //         res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS)
-    //         res.redirect("/");
-    //         //res.send({ success: true, token })
-    //       }
-    //     })
-    //   },
-    //   err => next(err)
-    // )
-    // res.redirect("/");
-});
+
 
 router.post("/refreshToken", (req, res, next) => {
   const { signedCookies = {} } = req
@@ -147,6 +144,25 @@ router.post("/refreshToken", (req, res, next) => {
 
 router.get("/me", verifyUser, (req, res, next) => {
     res.send(req.user);
+});
+
+//Receive an email address, return whether it is associated with a user.
+router.post("/exists", verifyUser, async (req, res) => {
+  if(req.body.user){
+    User.findOne({email: req.body.user}, (err, user) => {
+      let valid = false;
+      if(err){
+        console.log(err)
+      }
+      if(user){
+        valid = true;
+      }
+      res.send({validUser: valid});
+    })
+  }
+  else{
+    res.sendStatus(400);
+  }
 });
 
 router.get("/logout", verifyUser, (req, res, next) => {

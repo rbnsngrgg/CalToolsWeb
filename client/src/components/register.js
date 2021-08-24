@@ -3,11 +3,13 @@ import { UserContext } from "../context/UserContext"
 
 const Register = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
+    // eslint-disable-next-line
     const [error, setError] = useState("")
     const [firstName, setFirstName] = useState("")
     const [lastName, setLastName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    // eslint-disable-next-line
     const [userContext, setUserContext] = useContext(UserContext)
     const formSubmitHandler = e => {
       e.preventDefault()
