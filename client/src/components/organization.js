@@ -42,6 +42,14 @@ const OrganizationComponent = (props) => {
         }});
     }, [userContext.token, setInvitations]);
 
+    const rejectInvitation = (index) => {
+      console.log("Reject " + index);
+    }
+    
+    const acceptInvitation = (index) => {
+      console.log("Accept " + index);
+    }
+
     useEffect(() => {
       // fetch only when user details are not present
       if (!organizationNames) {
@@ -55,7 +63,7 @@ const OrganizationComponent = (props) => {
         <>
         {organizationNames !== null & invitations !== null ? 
         (<>
-          <h1 className="mt-4">Organizations</h1>
+          <h1 className="mt-4 text-xl font-semibold">Organizations</h1>
           <div className="flex justify-center items-center flex flex-row">
             <div className="inline-block relative w-64 mt-3">
               <select className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
@@ -72,8 +80,24 @@ const OrganizationComponent = (props) => {
             </Link>
           </div>
           <hr className="mt-10 mb-4"/>
-          <div className="flex justify-center items-center">
-            <h2>Invitations</h2>
+          <div className="flex flex-col justify-center items-center">
+            <h2 className="text-xl font-semibold">Invitations</h2>
+            {invitations.map((inv,ind) => {
+              let permission;
+              if(inv.permissions === 0){ permission = "Read Only"; }
+              else if (inv.permissions === 1){ permission = "Read/Update" }
+              else if (inv.permissions === 2) { permission = "Create/Read/Update/Delete" }
+              else if (inv.permissions === 3) { permission = "Admin (all content/user privileges)" }
+              return (
+                <div className="flex flex-row" key={ind}>
+                  <div className="border-2 px-2 py-1 rounded border-gray-500 mr-1">
+                    <p className="text-lg">{inv.name}: {permission}</p>
+                  </div>
+                  <button onClick={() => { rejectInvitation(ind) }} id={`reject${ind}`} className="bg-red-300 hover:bg-red-500 text-red-700 font-semibold hover:text-white px-3 ml-1 border border-red-500 hover:border-transparent rounded">X</button>
+                  <button onClick={() => { acceptInvitation(ind) }} id={`accept${ind}`} className="bg-green-300 hover:bg-green-500 text-green-700 font-semibold hover:text-white px-3 ml-1 border border-green-500 hover:border-transparent rounded">{"\u2713"}</button>
+                </div>
+                )
+            })}
           </div>
         </>
         ) : <Loader/>}

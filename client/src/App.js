@@ -14,7 +14,6 @@ import ProfileComponent from "./components/profile";
 function App() {
   const [userContext, setUserContext] = useContext(UserContext)
   const fetchUserDetails = useCallback(() => {
-    console.log("Setting details");
     fetch(process.env.REACT_APP_API_ENDPOINT + "users/me", {
       method: "GET",
       credentials: "include",
