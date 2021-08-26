@@ -10,10 +10,8 @@ const jwt = require("jsonwebtoken");
 function sendInvitations(users, orgId) {
     for(let i = 0; i < users.length; i++){
         let update = {$push: {invitations: {organization: orgId, permissions: users[i].permission}}};
-        console.log(users[i]);
         User.findOneAndUpdate({email: users[i].email}, update, {new: true}, (err, user) => {
             if(err){ console.log(err); }
-            if(user){ console.log(user); }
         });
     }
 }

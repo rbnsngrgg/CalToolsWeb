@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext"
 import { useHistory } from "react-router";
 
-const Navbar = () => {
+const Navbar = (props) => {
     const [userContext, setUserContext] = useContext(UserContext);
     const history = useHistory();
     const logoutHandler = async () => {
@@ -21,7 +21,6 @@ const Navbar = () => {
             history.push("/");
             })
     }
-      
     return (
         <nav className="flex items-center justify-between flex-wrap bg-gray-600 p-6">
         <div className="flex items-center flex-shrink-0 text-white mr-6">
@@ -39,10 +38,10 @@ const Navbar = () => {
                 <Link to="/items" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-400 mr-4">
                     Item List
                 </Link>
-                <Link to="/organization" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-400 mr-4">
+                <Link to="/organization" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-400 mr-4" onClick={props.fetchUserDetails}>
                     Organization
                 </Link>
-                <Link to="/" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-400 mr-4">
+                <Link to="/users/me/profile" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-400 mr-4">
                     User
                 </Link>
                 <button text="Logout" onClick={logoutHandler} intent="primary" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-400">Logout</button>

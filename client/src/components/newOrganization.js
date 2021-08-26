@@ -1,12 +1,14 @@
-import React, { useContext, useState, useCallback, useEffect } from "react"
+import React, { useContext, useState, useEffect } from "react"
 import { UserContext } from "../context/UserContext"
-
-const NewOrganizationComponent = () => {
+import { useHistory
+ } from "react-router";
+const NewOrganizationComponent = (props) => {
     // eslint-disable-next-line
     const [userContext, setUserContext] = useContext(UserContext);
     const [userList, setUserList] = useState([]);
     const [lastUserValid, setLastUserValid] = useState(true);
     const [orgNameAvailable, setOrgNameAvailable] = useState(null);
+    const history = useHistory();
 
     const isUserValid = async (u) => {
         let valid = false;
@@ -44,10 +46,10 @@ const NewOrganizationComponent = () => {
                 available = data.available;
             }
         });
-        console.log(available);
         return available;
     }
     const formSubmitHandler = async (e) => {
+        e.preventDefault();
         let orgName = document.getElementById("new-org-name").value;
         if(await isOrgNameAvailable(orgName)){
             fetch(process.env.REACT_APP_API_ENDPOINT + "organizations/create", {
@@ -65,11 +67,10 @@ const NewOrganizationComponent = () => {
               })
               .then(async response => {
                 if (response.ok) {
-                    const data = await response.json();
-                    console.log(data);
+                    props.fetchUserDetails();
+                    history.push("/organization");
                 }});
         }
-        e.preventDefault();
     }
 
     const userEnterHandler = async (e) => {
@@ -105,49 +106,21 @@ const NewOrganizationComponent = () => {
         var user = targetDiv.getAttribute("user");
         setUserList(userList.filter(u => u !== user))
     }
-    const fetchUserDetails = useCallback(() => {
-        fetch(process.env.REACT_APP_API_ENDPOINT + "users/me", {
-          method: "GET",
-          credentials: "include",
-          // Pass authentication token as bearer token in header
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userContext.token}`,
-          },
-        }).then(async response => {
-          if (response.ok) {
-            const data = await response.json()
-            setUserContext(oldValues => {
-              return { ...oldValues, details: data }
-            })
-          } else {
-            if (response.status === 401) {
-              // Edge case: when the token has expired.
-              // This could happen if the refreshToken calls have failed due to network error or
-              // User has had the tab open from previous day and tries to click on the Fetch button
-              window.location.reload()
-            } else {
-              setUserContext(oldValues => {
-                return { ...oldValues, details: null }
-              })
-            }
-          }
-        })
-      }, [setUserContext, userContext.token])
-  
-      useEffect(() => {
-        // fetch only when user details are not present
-        if (!userContext.details) {
-          fetchUserDetails()
-        }
-      }, [userContext.details, fetchUserDetails])   
+
+    useEffect(() => {
+    // fetch only when user details are not present
+    if (!userContext.details) {
+        props.fetchUserDetails()
+    }
+    // eslint-disable-next-line
+    }, [userContext.details, props.fetchUserDetails])   
 
       return (
         <div className=" flex-col justify-center items-center">
             <h1>New Organization</h1>
             <hr/>
             <div className="w-screen flex justify-center items-start">
-                <form className="mt-10 w-1/2" onSubmit={formSubmitHandler}>
+                <form className="mt-10 w-1/2" onSubmit={formSubmitHandler} autoComplete="off">
                     <div className="flex flex-wrap -mx-3 mb-6">
                         <div className="w-full px-3">
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">

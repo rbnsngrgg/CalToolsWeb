@@ -142,8 +142,39 @@ router.post("/refreshToken", (req, res, next) => {
   }
 });
 
-router.get("/me", verifyUser, (req, res, next) => {
+async function getOrgNames(orgIds){
+  let orgNames = [];
+  for(let i = 0; i < orgIds.length; i++){
+    await Organization.findById(orgIds[i], (err, org) => {
+      if(err){
+        console.log(err);
+      }
+      if(org){orgNames.push(org.name);}
+    })
+  }
+  return orgNames;
+}
+
+router.get("/me", verifyUser, async (req, res, next) => {
     res.send(req.user);
+});
+
+router.get("/me/organizations", verifyUser, async (req, res) => {
+  getOrgNames(req.user.organizations).then((names) => {res.send(JSON.stringify(names));});
+});
+
+router.get("/me/invitations", verifyUser, async (req, res) => {
+  User.findById(req.user._id, async (err, user) => {
+    if(err){
+      console.log(err);
+    }
+    if(user){
+      let orgIds = user.invitations.map(i => { return i.organization; });
+      getOrgNames(orgIds).then(names => {
+        res.send(JSON.stringify(names.map((n,i) => {return {name: n, permissions: user.invitations[i].permissions}})));
+      })
+    }
+  });
 });
 
 //Receive an email address, return whether it is associated with a user.

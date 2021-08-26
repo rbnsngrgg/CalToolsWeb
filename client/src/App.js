@@ -9,9 +9,40 @@ import Loader from "./components/loader"
 import Navbar from "./components/navbar";
 import OrganizationComponent from "./components/organization";
 import NewOrganizationComponent from "./components/newOrganization";
+import ProfileComponent from "./components/profile";
 
 function App() {
   const [userContext, setUserContext] = useContext(UserContext)
+  const fetchUserDetails = useCallback(() => {
+    console.log("Setting details");
+    fetch(process.env.REACT_APP_API_ENDPOINT + "users/me", {
+      method: "GET",
+      credentials: "include",
+      // Pass authentication token as bearer token in header
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userContext.token}`,
+      },
+    }).then(async response => {
+      if (response.ok) {
+        const data = await response.json()
+        setUserContext(oldValues => {
+          return { ...oldValues, details: data }
+        })
+      } else {
+        if (response.status === 401) {
+          // Edge case: when the token has expired.
+          // This could happen if the refreshToken calls have failed due to network error or
+          // User has had the tab open from previous day and tries to click on the Fetch button
+          window.location.reload()
+        } else {
+          setUserContext(oldValues => {
+            return { ...oldValues, details: null }
+          })
+        }
+      }
+    })
+  }, [setUserContext, userContext.token])
 
   const verifyUser = useCallback(() => {
     fetch(process.env.REACT_APP_API_ENDPOINT + "users/refreshToken", {
@@ -57,7 +88,7 @@ function App() {
     <div className="App bg-gray-300 h-screen">
       <div>
         <Router>
-          <Navbar/>
+          <Navbar  fetchUserDetails={fetchUserDetails}/>
           {userContext.token === null ?
           (<div>
             <Switch>
@@ -71,8 +102,9 @@ function App() {
             (<>
             <Switch>
             <Route exact path="/" component={Home}/> 
-            <Route exact path="/organization" component={OrganizationComponent}/>
-            <Route exact path="/organization/new" component={NewOrganizationComponent}/>
+            <Route exact path="/organization" render={() => (<OrganizationComponent fetchUserDetails={fetchUserDetails}/>)}/>
+            <Route exact path="/organization/new" render={() => (<NewOrganizationComponent fetchUserDetails={fetchUserDetails}/>)}/>
+            <Route exact path="/users/me/profile" render={() => (<ProfileComponent fetchUserDetails={fetchUserDetails}/>)}/>
             <Route><Redirect to="/"/></Route>
             </Switch>
             </>)
