@@ -15,11 +15,14 @@ router.post("/signup", (req, res, next) => {
       message: "The first name is required",
     })
   } else {
+    console.log("Registering user");
     User.register(
-      new User({ username: req.body.username }),
+      new User({ email: req.body.email }),
       req.body.password,
       (err, user) => {
         if (err) {
+          console.log("Error registering user");
+          console.log(err);
           res.statusCode = 500
           res.send(err)
         } else {
@@ -171,10 +174,50 @@ router.get("/me/invitations", verifyUser, async (req, res) => {
     if(user){
       let orgIds = user.invitations.map(i => { return i.organization; });
       getOrgNames(orgIds).then(names => {
-        res.send(JSON.stringify(names.map((n,i) => {return {name: n, permissions: user.invitations[i].permissions}})));
+        res.send(JSON.stringify(names.map((n,i) => {return {name: n, permissions: user.invitations[i].permissions, id: user.invitations[i].organization}})));
       })
     }
   });
+});
+
+router.post("/me/invitations", verifyUser, async (req, res) => {
+  if(req.body.selection === "reject"){
+    let orgUpdate = {$pull: {users:{userId: req.user._id}}}
+    Organization.findByIdAndUpdate(req.body.id, orgUpdate, {new:true, useFindAndModify: false}, (err, org)=>{
+      if(err){
+        res.sendStatus(500);
+      }
+      else if(org){
+        let userUpdate = {$pull: {invitations: {organization: org._id}}}
+        User.findByIdAndUpdate(req.user._id, userUpdate, {new: true, useFindAndModify: false}, (err, user)=> {
+          if(err){res.sendStatus(500);}
+          else if(user){res.sendStatus(200);}
+        });
+      }
+    })
+  }
+  else if(req.body.selection === "accept"){
+    Organization.findById(req.body.id, (err, org) => {
+      if (err){console.log(err); res.sendStatus(500);}
+      else if(org){
+        org.users.forEach(user => {
+          if(String(user.userId) === String(req.user._id)){
+            user.accepted = true;
+            org.save().then(() =>{
+              let userUpdate = {$pull: {invitations: {organization: org._id}}, $push: {organizations: org._id}}
+              User.findByIdAndUpdate(req.user._id, userUpdate, {new: true, useFindAndModify: false}, (err, user)=> {
+                if(err){res.sendStatus(500);}
+                else if(user){ res.sendStatus(200); }
+                });
+            });
+          }
+        });
+      }
+    })
+  }
+  else{
+    res.sendStatus(400);
+  }
 });
 
 //Receive an email address, return whether it is associated with a user.

@@ -12,7 +12,24 @@ const OrganizationSchema = mongoose.Schema({
     name: {
         type: String,
         required: true,
-        unique: true
+        index: {
+            unique: true,
+            collation: {
+                locale: "en",
+                strength: 2,
+            }
+        }
+    },
+    _name_lower: {
+        type: String,
+        required: true,
+        index: {
+            unique: true,
+            collation: {
+                locale: "en",
+                strength: 2,
+            }
+        }
     },
     users: [{
         userId: {
@@ -24,6 +41,10 @@ const OrganizationSchema = mongoose.Schema({
             type: Number,
             min: 0,
             max: 3,
+            required: true
+        },
+        accepted: {
+            type: Boolean,
             required: true
         }
     }],

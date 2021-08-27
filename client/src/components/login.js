@@ -1,5 +1,6 @@
-import React, { useContext, useState } from "react"
-import { UserContext } from "../context/UserContext"
+import React, { useContext, useState } from "react";
+import { UserContext } from "../context/UserContext";
+import { Link } from "react-router-dom";
 
 const Login = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -18,7 +19,7 @@ const Login = () => {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username: email, password }),
+          body: JSON.stringify({ email: email, password }),
         })
           .then(async response => {
             setIsSubmitting(false)
@@ -56,7 +57,8 @@ const Login = () => {
               <input id="email" type="email" value={email} className="h-12 rounded w-full border px-3 focus:text-black focus:border-blue-100" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
               <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} className="h-12 mt-3 rounded w-full border px-3 focus:text-black focus:border-blue-100" placeholder="Password"/>
               {error !== "" && <label className="text-red-500	">{error}</label> }
-              <div className="flex justify-end items-center mt-2"> <a className="text-gray-400 hover:text-gray-600">Forgot password?</a> </div>
+              <div className="flex justify-end items-center mt-2"><Link to="/register" className="text-gray-400 hover:text-gray-600">Register</Link></div>
+              <div className="flex justify-end items-center mt-2"><a className="text-gray-400 hover:text-gray-600">Forgot password?</a> </div>
               <button intent="primary" type="submit" disabled={isSubmitting} className="uppercase h-12 mt-3 text-white w-full rounded bg-gray-700 hover:bg-gray-800">
                 {`${isSubmitting ? "Logging In" : "Log In"}`}
               </button>

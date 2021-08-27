@@ -45,7 +45,7 @@ userSchema.set("toJSON", {
     }
 });
 
-userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose, {usernameField: 'email'});
 userSchema.plugin(findOrCreate);
 
 

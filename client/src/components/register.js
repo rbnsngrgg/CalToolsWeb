@@ -20,7 +20,7 @@ const Register = () => {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, username: email, password }),
+        body: JSON.stringify({ firstName, lastName, email: email, password }),
       })
         .then(async response => {
           setIsSubmitting(false)

@@ -42,12 +42,22 @@ const OrganizationComponent = (props) => {
         }});
     }, [userContext.token, setInvitations]);
 
-    const rejectInvitation = (index) => {
-      console.log("Reject " + index);
-    }
-    
-    const acceptInvitation = (index) => {
-      console.log("Accept " + index);
+        
+    const acceptOrRejectInvitation = (index, userSelection) => {
+      fetch(process.env.REACT_APP_API_ENDPOINT + "users/me/invitations", {
+        method: "POST",
+        credentials: "include",
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userContext.token}`
+        },
+        body: JSON.stringify({ id: invitations[index].id, selection: userSelection }),
+      })
+      .then(async response => {
+        if (response.ok) {
+          console.log("Invitation " + userSelection);
+        }
+      })
     }
 
     useEffect(() => {
@@ -93,8 +103,8 @@ const OrganizationComponent = (props) => {
                   <div className="border-2 px-2 py-1 rounded border-gray-500 mr-1">
                     <p className="text-lg">{inv.name}: {permission}</p>
                   </div>
-                  <button onClick={() => { rejectInvitation(ind) }} id={`reject${ind}`} className="bg-red-300 hover:bg-red-500 text-red-700 font-semibold hover:text-white px-3 ml-1 border border-red-500 hover:border-transparent rounded">X</button>
-                  <button onClick={() => { acceptInvitation(ind) }} id={`accept${ind}`} className="bg-green-300 hover:bg-green-500 text-green-700 font-semibold hover:text-white px-3 ml-1 border border-green-500 hover:border-transparent rounded">{"\u2713"}</button>
+                  <button onClick={() => { acceptOrRejectInvitation(ind, "reject") }} id={`reject${ind}`} className="bg-red-300 hover:bg-red-500 text-red-700 font-semibold hover:text-white px-3 ml-1 border border-red-500 hover:border-transparent rounded">X</button>
+                  <button onClick={() => { acceptOrRejectInvitation(ind, "accept") }} id={`accept${ind}`} className="bg-green-300 hover:bg-green-500 text-green-700 font-semibold hover:text-white px-3 ml-1 border border-green-500 hover:border-transparent rounded">{"\u2713"}</button>
                 </div>
                 )
             })}

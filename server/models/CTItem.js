@@ -32,6 +32,10 @@ const CTItemSchema = mongoose.Schema({
         type: String,
         default: ""
     },
+    category: {
+        type: String,
+        default: "Default Category"
+    },
     itemGroup: {
         type: String,
         default: ""

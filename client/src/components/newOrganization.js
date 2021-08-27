@@ -43,7 +43,7 @@ const NewOrganizationComponent = (props) => {
         .then(async response => {
             if(response.ok) {
                 const data = await response.json();
-                available = data.available;
+                available = !data.exists;
             }
         });
         return available;
