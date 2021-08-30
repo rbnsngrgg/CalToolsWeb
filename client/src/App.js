@@ -86,18 +86,17 @@ function App() {
 
   return (
     <div className="App bg-gray-300 h-screen">
-      <div>
-        <Router>
+        <Router className="h-full">
           <Navbar  fetchUserDetails={fetchUserDetails}/>
           {userContext.token === null ?
-          (<div>
+          (<>
             <Switch>
             <Route exact path="/"><Redirect to="/login"/></Route>
             <Route exact path="/register" component={Register}/>
             <Route exact path="/login" component={Login}/>
             <Route><Redirect to="/login"/></Route>
             </Switch>
-          </div>) : 
+          </>) : 
             userContext.token ? 
             (<>
             <Switch>
@@ -112,7 +111,6 @@ function App() {
             :<Loader/>
           }
         </Router>
-      </div>
     </div>
   )
 }

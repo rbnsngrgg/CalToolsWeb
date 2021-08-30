@@ -14,6 +14,7 @@ require("./strategies/GoogleStrategy");
 require("./authenticate");
 const userRouter = require("./routes/userRoutes");
 const orgRouter = require("./routes/organizationRoutes");
+const itemRouter = require("./routes/itemRoutes");
 
 const app = express();
 
@@ -46,9 +47,9 @@ app.use(passport.initialize());
 //app.use(passport.session());
 
 //Route includes
-const dataRoute = require("./routes/data")
 app.use("/users", userRouter);
 app.use("/organizations", orgRouter);
+app.use("/items", itemRouter);
 // app.use("/data", dataRoute);
 
 
