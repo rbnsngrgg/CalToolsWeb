@@ -14,9 +14,8 @@ router.get("/:organization", verifyUser, async(req, res) => {
                 console.log("Valid");
                 Organization.findOne({_nameLower: req.params.organization.toLowerCase()})
                     .then(org => {
-                        res.send([]);
+                        res.send({items: []});
                     })
-                res.sendStatus(200);
             }
             else{
                 console.log("Not valid");

@@ -85,7 +85,7 @@ function App() {
   }, [syncLogout])  
 
   return (
-    <div className="App bg-gray-300 h-screen">
+    <div className="App bg-gray-300 h-screen overflow-auto">
         <Router className="h-full">
           <Navbar  fetchUserDetails={fetchUserDetails}/>
           {userContext.token === null ?

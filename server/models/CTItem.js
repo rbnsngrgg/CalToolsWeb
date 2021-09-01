@@ -7,6 +7,10 @@ const CTItemSchema = mongoose.Schema({
         ref: "Organization",
         required: true,
     },
+    itemCategory: {
+        type: String,
+        default: "General Items"
+    },
     serialNumber: {
         type: String,
         required: true,
