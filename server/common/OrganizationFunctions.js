@@ -1,7 +1,8 @@
 const User = require("../models/User");
 const Organization = require("../models/Organization");
+const CTItem = require("../models/CTItem");
 
-class OrganizationUserFunctions{
+class OrganizationFunctions{
     async OrganizationUserHasPermissionAsync(orgName, userId, permissionLevel){
         return new Promise((resolve, reject) => {
             let valid = false;
@@ -14,15 +15,27 @@ class OrganizationUserFunctions{
                             break;
                         }
                     }
-                    resolve(valid);
+                    resolve({isValid: valid, orgId: org._id});
                 }
             });
         });
     }
 
-    Test(){
-        console.log("Test");
+    async OrgHasItem(orgName, itemSn){
+        return new Promise((resolve,reject) => {
+            let hasItem = false;
+            //find item
+            Organization.findOne({_name_lower: orgName.toLowerCase()}, (err, org) => {
+                if(err || !org) {console.log(err); reject("Error finding the specified organization.");}
+                if(org){
+                    CTItem.findOne({organizationId: org._id, serialNumber: itemSn}, (err, item) => {
+                        if(item){ hasItem = true;}
+                        resolve(hasItem);
+                    })
+                }
+            })
+        })
     }
 }
 
-module.exports = new OrganizationUserFunctions();
+module.exports = new OrganizationFunctions();

@@ -29,7 +29,16 @@ const ItemListComponent = (props) => {
 
       const saveItem = async () => {
         let itemData = {
-            serialNumber: document.getElementById("snInput")
+            itemCategory: document.getElementById("categoryInput").value,
+            serialNumber: document.getElementById("snInput").value,
+            model: document.getElementById("modelInput").value,
+            itemDescription: document.getElementById("descriptionInput").value,
+            location: document.getElementById("locationInput").value,
+            manufacturer: document.getElementById("manufacturerInput").value,
+            isStandardEquipment: document.getElementById("standardEquipmentInput").checked,
+            inOperation: document.getElementById("inOperationInput").checked,
+            itemGroup: document.getElementById("itemGroupInput").value,
+            remarks: document.getElementById("remarksInput").value
         }
         fetch(process.env.REACT_APP_API_ENDPOINT + "items/save", {
             method: "POST",
@@ -39,7 +48,10 @@ const ItemListComponent = (props) => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${userContext.token}`,
             },
-            body: JSON.stringify(itemData)
+            body: JSON.stringify({
+                item: itemData,
+                organization: document.getElementById("orgSelect").value
+            })
           })
           .then(async response => {
             if (response.ok) {
@@ -85,6 +97,13 @@ const ItemListComponent = (props) => {
         if(readOnly){
             toggleEdit();
         }
+    }
+
+    const saveEditButtonClick = () => {
+        if(!readOnly){
+            saveItem();
+        }
+        toggleEdit();
     }
 
     const toggleEdit = () => {
@@ -213,8 +232,8 @@ const ItemListComponent = (props) => {
                     </div>
                     <div className="flex w-full items-center justify-center justify-evenly">
                         <button id="newItemButton" className="my-2 border-2 border-gray-400 justify-self-start rounded-md w-1/6 hover:bg-gray-100" onClick={newItem}>New Item</button>
-                        <button id="editButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={toggleEdit}>Edit</button>
-                        <button disabled id="cancelButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={cancelButtonClick}>Cancel</button>
+                        <button id="editButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={saveEditButtonClick}>Edit</button>
+                        <button disabled={readOnly} id="cancelButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={cancelButtonClick}>Cancel</button>
                     </div>
                 </div>
             </div>

@@ -13,8 +13,7 @@ const CTItemSchema = mongoose.Schema({
     },
     serialNumber: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     location: {
         type: String,
@@ -28,17 +27,13 @@ const CTItemSchema = mongoose.Schema({
         type: String,
         default: ""
     },
-    inService: {
+    inOperation: {
         type: Boolean,
         required: true
     },
     model: {
         type: String,
         default: ""
-    },
-    category: {
-        type: String,
-        default: "Default Category"
     },
     itemGroup: {
         type: String,
