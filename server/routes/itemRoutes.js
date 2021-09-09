@@ -11,11 +11,12 @@ const CTItem = require("../models/CTItem");
 router.get("/:organization", verifyUser, async(req, res) => {
     OrgFunctions.OrganizationUserHasPermissionAsync(req.params.organization, req.user._id, 0)
         .then(r => {
-            if(r){
-                Organization.findOne({_nameLower: req.params.organization.toLowerCase()})
-                    .then(org => {
-                        res.send({items: []});
-                    })
+            if(r.isValid){
+                CTItem.find({organizationId: r.orgId})
+                    .then(orgItems => {
+                        let list = orgItems.map(i => {return {itemCategory: i.itemCategory, serialNumber: i.serialNumber}})
+                        res.send({items: list});
+                    });
             }
             else{
                 res.sendStatus(401);
@@ -24,6 +25,19 @@ router.get("/:organization", verifyUser, async(req, res) => {
         .catch(err => {
             console.log(err);
             res.sendStatus(404);
+        })
+});
+
+router.get("/:organization/:serialNumber", verifyUser, async(req,res) => {
+    OrgFunctions.OrganizationUserHasPermissionAsync(req.params.organization, req.user._id, 0)
+        .then(r => {
+            if(r.isValid){
+                CTItem.findOne({organizationId: r.orgId, serialNumber: req.params.serialNumber})
+                    .then(item => {
+                        console.log(item);
+                        res.send({item:item});
+                    })
+            }
         })
 });
 
@@ -54,21 +68,41 @@ router.post("/save", verifyUser, async(req, res) => {
                         certificateNumber: req.body.item.certificateNumber || ""
                     }
                     if(reqPermission == 2){
-                        //create
-                        console.log(item);
+                        CTItem.create(item);
+                        res.sendStatus(200);
                     }
                     else if(reqPermission == 1){
-                        //update
+                        CTItem.findOneAndUpdate({organizationId: r.orgId, serialNumber: req.body.item.serialNumber}, item, {useFindAndModify:false})
+                        .then(item => {
+                            res.sendStatus(200);
+                        })
                     }
-                    //CTItem.create();
                     
-                    res.sendStatus(200);
                 }
                 else{
                     res.sendStatus(401);
                 }
             })
         })
+});
+
+router.post("/delete", verifyUser, async(req, res) => {
+    OrgFunctions.OrganizationUserHasPermissionAsync(req.body.organization, req.user._id, 2)
+    .then(r => {
+        if(r.isValid){
+            CTItem.deleteOne({organizationId: r.orgId, serialNumber: req.body.serialNumber})
+            .then(result => {
+                if(result.ok){res.sendStatus(200);}
+                else{res.sendStatus(500);}
+            });
+        }
+        else{
+            console.log("not valid");
+            res.statusMessage = "Not authorized to delete items within the current organization."
+            res.sendStatus(403);
+        }
+    })
+    .catch(() => res.sendStatus(500));
 });
 
   module.exports = router;

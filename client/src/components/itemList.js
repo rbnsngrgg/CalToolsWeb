@@ -5,12 +5,18 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 const ItemListComponent = (props) => {
     let contextTrigger = null;
     let contextMenuTriggeredItem = null;
+    const [errorMessage, setErrorMessage] = useState("");
+    const [deleteConfirm, setDeleteConfirm] = useState(false);
     const [userContext, setUserContext] = useContext(UserContext);
     const [items, setItems] = useState(null);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [categories, setCategories] = useState([]);
     const [organizationNames, setOrganizationNames] = useState(null);
     const [readOnly, setReadOnly] = useState(true);
 
     const fetchItems = useCallback(() => {
+        clearForm();
+        if(!readOnly){ toggleEdit(); }
         fetch(process.env.REACT_APP_API_ENDPOINT + "items/" + document.getElementById("orgSelect").value, {
           method: "GET",
           credentials: "include",
@@ -23,9 +29,42 @@ const ItemListComponent = (props) => {
         .then(async response => {
           if (response.ok) {
             let data = await response.json();
-            setItems(data);
+            setItems(data.items);
+            let newCategories = []
+            for(let i = 0; i < data.items.length; i++){
+                if(!newCategories.includes(data.items[i].itemCategory)){
+                    newCategories.push(data.items[i].itemCategory);
+                }
+            }
+            setCategories(newCategories);
           }});
-      }, [userContext.token, setItems]);
+      }, [userContext.token, setItems, setCategories, readOnly]);
+
+      const fetchItemDetails = useCallback(() => {
+        fetch(process.env.REACT_APP_API_ENDPOINT + "items/" + document.getElementById("orgSelect").value + "/" + document.getElementById("itemSelect").value, {
+            method: "GET",
+            credentials: "include",
+            // Pass authentication token as bearer token in header
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userContext.token}`,
+            }
+          })
+          .then(async response => {
+            if (response.ok) {
+              let data = await response.json();
+              document.getElementById("categoryInput").value = data.item.itemCategory;
+              document.getElementById("snInput").value = data.item.serialNumber;
+              document.getElementById("modelInput").value = data.item.model;
+              document.getElementById("descriptionInput").value = data.item.itemDescription;
+              document.getElementById("locationInput").value = data.item.location;
+              document.getElementById("manufacturerInput").value = data.item.manufacturer;
+              document.getElementById("standardEquipmentInput").checked = data.item.isStandardEquipment;
+              document.getElementById("inOperationInput").checked = data.item.inOperation;
+              document.getElementById("itemGroupInput").value = data.item.itemGroup;
+              document.getElementById("remarksInput").value = data.item.remarks;
+            }});
+        }, [userContext.token, setSelectedItem])
 
       const saveItem = async () => {
         let itemData = {
@@ -55,31 +94,60 @@ const ItemListComponent = (props) => {
           })
           .then(async response => {
             if (response.ok) {
-                props.fetchUserDetails();;
+                fetchItems();
+                if(document.getElementById("itemSelect").value)
+                {
+                    fetchItemDetails();
+                }
             }
             else{
-                console.log(response);
+                setErrorMessage(response);
             }
         });
-  }
+    }
   
-      const fetchOrganizationNames = useCallback(() => {
+    const fetchOrganizationNames = useCallback(() => {
         fetch(process.env.REACT_APP_API_ENDPOINT + "users/me/organizations", {
-          method: "GET",
-          credentials: "include",
-          // Pass authentication token as bearer token in header
-          headers: {
+            method: "GET",
+            credentials: "include",
+            // Pass authentication token as bearer token in header
+            headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${userContext.token}`,
-          }
+            }
         })
         .then(async response => {
-          if (response.ok) {
+            if (response.ok) {
             let data = await response.json();
             setOrganizationNames(data);
-          }});
-      }, [userContext.token, setOrganizationNames]);
-        
+            }});
+    }, [userContext.token, setOrganizationNames]);
+    
+    const deleteItem = useCallback(() => {
+        fetch(process.env.REACT_APP_API_ENDPOINT + "items/delete", {
+            method: "POST",
+            credentials: "include",
+            // Pass authentication token as bearer token in header
+            headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userContext.token}`,
+            },
+            body: JSON.stringify({
+                serialNumber: document.getElementById("snInput").value,
+                organization: document.getElementById("orgSelect").value
+            })
+        })
+        .then(async response => {
+            if(response.ok) {
+                fetchItems();
+            }
+            else{
+                let text = response.statusText;
+                setErrorMessage(text);
+            }
+        })
+    }, [userContext.token]);
+
     const handleClick = (e,data) => {
         console.log(contextMenuTriggeredItem);
     }
@@ -118,6 +186,7 @@ const ItemListComponent = (props) => {
         }
         document.getElementById("editButton").innerText = readOnly ? "Save" : "Edit";
         document.getElementById("cancelButton").disabled = !readOnly;
+        document.getElementById("itemDeleteButton").disabled = !readOnly;
         setReadOnly(!readOnly);
     }
 
@@ -134,11 +203,37 @@ const ItemListComponent = (props) => {
     }
 
     const selectedItemChanged = () => {
-        console.log(document.getElementById("itemSelect").value);
+        if(!readOnly){ toggleEdit(); }
+        fetchItemDetails();
     }
 
     const cancelButtonClick = () => {
-        console.log("Cancel");
+        setDeleteConfirm(false);
+        toggleEdit();
+        fetchItemDetails();
+    }
+
+    const deleteButtonClick = () => {
+        setDeleteConfirm(true);
+    }
+    const deleteConfirmSelection = (confirm) => {
+        if(confirm){
+            deleteItem();
+        }
+        setDeleteConfirm(false);
+    }
+
+    const buildItemCategory = (cat) => {
+        if(!items){return <></>}
+        let options = [];
+        for(let i = 0; i < items.length; i++){
+            if(items[i].itemCategory === cat){
+                options.push(<option key={items[i].serialNumber}>{items[i].serialNumber}</option>)
+            }
+        }
+        return <optgroup label={cat} key={cat}>
+            {options}
+        </optgroup>
     }
 
     useEffect(() => {
@@ -160,10 +255,7 @@ const ItemListComponent = (props) => {
             <div className="h-full mr-4 mb-8 mt-3 w-2/12">
                 <input type="text" placeholder="Search" className="w-full mb-1 px-2 border-2 border-gray-400 rounded-lg"/>
                 <select id="itemSelect" name="Items" size="2" className="h-5/6 w-full border-4 border-gray-400 rounded-lg" onChange={selectedItemChanged}>
-                    <optgroup label="Default Items">
-                        <option>Item 1</option>
-                        <option>Item 2</option>
-                    </optgroup>
+                    {categories.map(cat => buildItemCategory(cat))}
                 </select>
             </div>
             <div className="flex flex-col justify-start items-center w-3/5 my-8">
@@ -189,6 +281,25 @@ const ItemListComponent = (props) => {
                             ContextMenu Item 3
                         </MenuItem>
                     </ContextMenu>
+                    <div className="flex w-full items-center justify-center justify-evenly mb-2">
+                        <button id="newItemButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={newItem}>New Item</button>
+                        <button id="editButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={saveEditButtonClick}>Edit</button>
+                        <button disabled={readOnly} id="cancelButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={cancelButtonClick}>Cancel</button>
+                        <button disabled={readOnly} id="itemDeleteButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={() => {setDeleteConfirm(true)}}>Delete</button>
+                    </div>
+                    {deleteConfirm && 
+                        <div id="itemDeleteConfirm" className="flex flex-row w-full items-center justify-center justify-evenly mb-2 border-2 border-gray-500 rounded-md">
+                            <h1>Confirm item deletion?</h1>
+                            <button id="confirmItemDelete" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={() => deleteConfirmSelection(true)}>Confirm</button>
+                            <button id="cancelItemDelete" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={() => deleteConfirmSelection(false)}>Cancel</button>
+                        </div>
+                    }
+                    {errorMessage &&
+                        <div className="flex w-full items-center justify-center mb-2">
+                            <p className="text-red-500 text-xl">{errorMessage}</p>
+                            <button className="ml-4 px-2 text-sm border-2 border-red-400 rounded-md bg-red-300 text-white hover:bg-red-500" onClick={() => setErrorMessage("")}>X</button>
+                        </div>
+                    }
                     <form className="grid w-full grid-cols-4 grid-rows-20 gap-y-2" id="itemForm">
                         <label htmlFor="categoryInput" className="">Item Category:</label>
                         <input readOnly type="text" id="categoryInput" name="categoryInput" className="col-span-3" placeholder="Ex. Production Equipment"></input>
@@ -229,11 +340,6 @@ const ItemListComponent = (props) => {
                                 </tr>
                             </thead>
                         </table>
-                    </div>
-                    <div className="flex w-full items-center justify-center justify-evenly">
-                        <button id="newItemButton" className="my-2 border-2 border-gray-400 justify-self-start rounded-md w-1/6 hover:bg-gray-100" onClick={newItem}>New Item</button>
-                        <button id="editButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={saveEditButtonClick}>Edit</button>
-                        <button disabled={readOnly} id="cancelButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={cancelButtonClick}>Cancel</button>
                     </div>
                 </div>
             </div>
