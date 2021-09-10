@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const CTTaskSchema = require("./CTTask");
 
 const CTItemSchema = mongoose.Schema({
     organizationId: {
@@ -51,7 +50,7 @@ const CTItemSchema = mongoose.Schema({
         type: String,
         default: ""
     },
-    tasks: [CTTaskSchema]
+    tasks: [{type: mongoose.Schema.Types.ObjectId, ref: "CTTask"}]
 }, { timestamps: true });
 
 const CTItem = mongoose.model("CTItem", CTItemSchema);

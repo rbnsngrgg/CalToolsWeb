@@ -2,6 +2,16 @@
 const mongoose = require("mongoose");
 
 const CTTaskSchema = mongoose.Schema({
+    itemId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CTItem",
+        required: true,
+    },
+    organizationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Organization",
+        required: true,
+    },
     title: {
         type: String,
         required: true
@@ -35,4 +45,5 @@ const CTTaskSchema = mongoose.Schema({
     taskData: [{type: mongoose.Schema.Types.ObjectId, ref: "TaskData"}]
 }, { timestamps: true });
 
-module.exports = CTTaskSchema;
+const CTTask = mongoose.model("CTTask", CTTaskSchema);
+module.exports = CTTask;

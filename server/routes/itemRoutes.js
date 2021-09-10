@@ -7,6 +7,7 @@ const { getToken, COOKIE_OPTIONS, getRefreshToken, verifyUser } = require("../au
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const CTItem = require("../models/CTItem");
+const CTTask = require("../models/CTTask");
 
 router.get("/:organization", verifyUser, async(req, res) => {
     OrgFunctions.OrganizationUserHasPermissionAsync(req.params.organization, req.user._id, 0)
@@ -36,6 +37,19 @@ router.get("/:organization/:serialNumber", verifyUser, async(req,res) => {
                     .then(item => {
                         console.log(item);
                         res.send({item:item});
+                    })
+            }
+        })
+});
+
+router.get("/:organization/:serialNumber/tasks", verifyUser, async(req,res) => {
+    OrgFunctions.OrganizationUserHasPermissionAsync(req.params.organization, req.user._id, 0)
+        .then(r => {
+            if(r.isValid){
+                CTItem.findOne({organizationId: r.orgId, serialNumber: req.params.serialNumber})
+                    .populate('tasks')
+                    .then(item => {
+                        res.send({tasks:item.tasks});
                     })
             }
         })
@@ -105,4 +119,40 @@ router.post("/delete", verifyUser, async(req, res) => {
     .catch(() => res.sendStatus(500));
 });
 
-  module.exports = router;
+router.post("/tasks/save", verifyUser, async(req, res) => {
+    let reqPermission = String(req.body.task._id) === "0" ? 2 : 1;
+    console.log(req.body)
+    OrgFunctions.OrganizationUserHasPermissionAsync(req.body.organization, req.user._id, reqPermission)
+    .then(r => {
+        if(r.isValid){
+            let newTask = {
+                itemId: req.body.task.itemId,
+                organizationId: r.orgId,
+                title: req.body.task.title,
+                serviceVendor: req.body.task.serviceVendor,
+                isMandatory: req.body.task.isMandatory,
+                interval: req.body.task.interval,
+                completeDate: req.body.task.completeDate,
+                actionType: req.body.task.actionType,
+                remarks: req.body.task.remarks
+            }
+            if(reqPermission === 2){
+                console.log("Creating task");
+                CTTask.create(newTask)
+                .then((t) => {
+                    CTItem.findByIdAndUpdate(req.body.task.itemId, {$push:{tasks: t._id}}, {useFindAndModify: false})
+                    .then(res.sendStatus(200));
+                })
+            }
+            else{
+                CTTask.findOneAndUpdate({_id: req.body.task._id}, newTask, {useFindAndModify:false});
+            }
+        }
+        else{
+            res.sendStatus(403);
+        }
+    })
+    .catch(() => res.sendStatus(500));
+})
+
+module.exports = router;
