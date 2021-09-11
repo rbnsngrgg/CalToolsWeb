@@ -35,7 +35,7 @@ const Navbar = (props) => {
         </div>
         <div className="w-full block lg:flex lg:items-center lg:w-auto">
             <div className="text-sm lg:flex-grow">
-                <Link to="/items" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-400 mr-4">
+                <Link to="/itemlist" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-400 mr-4">
                     Item List
                 </Link>
                 <Link to="/organization" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-400 mr-4" onClick={props.fetchUserDetails}>

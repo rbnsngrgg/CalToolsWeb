@@ -35,7 +35,6 @@ router.get("/:organization/:serialNumber", verifyUser, async(req,res) => {
             if(r.isValid){
                 CTItem.findOne({organizationId: r.orgId, serialNumber: req.params.serialNumber})
                     .then(item => {
-                        console.log(item);
                         res.send({item:item});
                     })
             }
@@ -91,7 +90,6 @@ router.post("/save", verifyUser, async(req, res) => {
                             res.sendStatus(200);
                         })
                     }
-                    
                 }
                 else{
                     res.sendStatus(401);
@@ -111,7 +109,6 @@ router.post("/delete", verifyUser, async(req, res) => {
             });
         }
         else{
-            console.log("not valid");
             res.statusMessage = "Not authorized to delete items within the current organization."
             res.sendStatus(403);
         }
@@ -121,7 +118,6 @@ router.post("/delete", verifyUser, async(req, res) => {
 
 router.post("/tasks/save", verifyUser, async(req, res) => {
     let reqPermission = String(req.body.task._id) === "0" ? 2 : 1;
-    console.log(req.body)
     OrgFunctions.OrganizationUserHasPermissionAsync(req.body.organization, req.user._id, reqPermission)
     .then(r => {
         if(r.isValid){
@@ -137,7 +133,6 @@ router.post("/tasks/save", verifyUser, async(req, res) => {
                 remarks: req.body.task.remarks
             }
             if(reqPermission === 2){
-                console.log("Creating task");
                 CTTask.create(newTask)
                 .then((t) => {
                     CTItem.findByIdAndUpdate(req.body.task.itemId, {$push:{tasks: t._id}}, {useFindAndModify: false})
@@ -155,4 +150,20 @@ router.post("/tasks/save", verifyUser, async(req, res) => {
     .catch(() => res.sendStatus(500));
 })
 
+router.post("/tasks/delete", verifyUser, async(req, res) => {
+    CTTask.findById(req.body.taskId)
+    .then(task => {
+        OrgFunctions.OrganizationUserHasPermissionAsync("",req.user._id,2,task.organizationId)
+        .then(r => {
+            if(r.isValid){
+                CTTask.findByIdAndDelete(task._id, {useFindAndModify: false})
+                .then(res.sendStatus(200));
+            }
+            else{
+                res.sendStatus(403);
+            }
+        })
+    })
+    .catch(() => res.sendStatus(500))
+})
 module.exports = router;

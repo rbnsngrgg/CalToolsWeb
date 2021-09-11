@@ -101,7 +101,7 @@ function App() {
             (<>
             <Switch>
             <Route exact path="/" component={Home}/> 
-            <Route exact path="/items" render={() => (<ItemListComponent fetchUserDetails={fetchUserDetails}/>)}/>
+            <Route exact path="/itemlist" render={() => (<ItemListComponent fetchUserDetails={fetchUserDetails}/>)}/>
             <Route exact path="/organization" render={() => (<OrganizationComponent fetchUserDetails={fetchUserDetails}/>)}/>
             <Route exact path="/organization/new" render={() => (<NewOrganizationComponent fetchUserDetails={fetchUserDetails}/>)}/>
             <Route exact path="/users/me/profile" render={() => (<ProfileComponent fetchUserDetails={fetchUserDetails}/>)}/>

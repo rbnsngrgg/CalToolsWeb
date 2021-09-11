@@ -28,6 +28,7 @@ const ItemListComponent = (props) => {
     const [taskReadOnly, setTaskReadOnly] = useState(true);
     const [currentTasks, setCurrentTasks] = useState([]);
     const [showTaskDetails, setShowTaskDetails] = useState(false);
+    const [showTaskData, setShowTaskData] = useState(false);
     const [currentTask, setCurrentTask] = useState(defaultTask);
 
     const fetchItems = useCallback(() => {
@@ -212,6 +213,34 @@ const ItemListComponent = (props) => {
         })
     }, [userContext.token]);
 
+    const deleteTask = useCallback(() => {
+        console.log(currentTask)
+        fetch(process.env.REACT_APP_API_ENDPOINT + "items/tasks/delete", {
+            method: "POST",
+            credentials: "include",
+            // Pass authentication token as bearer token in header
+            headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userContext.token}`,
+            },
+            body: JSON.stringify({
+                taskId: document.getElementById("taskIdText").value
+            })
+        })
+        .then(async response => {
+            if(response.ok) {
+                fetchItems();
+                setDeleteTaskConfirm(false);
+                setShowTaskDetails(false);
+                fetchTasks();
+            }
+            else{
+                let text = response.statusText;
+                setErrorMessage(text);
+            }
+        })
+    }, [userContext.token]);
+
     const handleClick = (e,data) => {
         console.log(contextMenuTriggeredItem);
     }
@@ -232,9 +261,11 @@ const ItemListComponent = (props) => {
     }
 
     const newTask = () => {
-        console.log("New task");
-        let newTasks = currentTasks.slice();
         displayTaskDetails(defaultTask);
+    }
+
+    const newTaskData = () => {
+
     }
 
     const saveEditButtonClick = () => {
@@ -282,13 +313,15 @@ const ItemListComponent = (props) => {
     const taskToggleEdit = () => {
         let form = document.getElementById("taskForm");
         for(let i = 0; i < form.children.length; i++){
-            if((form.children[i].type === "text" || form.children[i].type === "textarea" || form.children[i].type === "number")
-                && form.children[i].id !== "taskIdText"
-                && form.children[i].id !== "dueDateText"){
-                form.children[i].readOnly = !readOnly;
+            if(form.children[i].type === "text" || form.children[i].type === "textarea" || form.children[i].type === "number"){
+                if(form.children[i].id !== "taskIdText" && form.children[i].id !== "dueDateText"){
+                    
+                    form.children[i].readOnly = !taskReadOnly;
+                    console.log(form.children[i].readOnly)
+                }
             }
             else if(form.children[i].type === "checkbox" && form.children[i].id !== "dueCheckbox"){
-                form.children[i].disabled = !readOnly;
+                form.children[i].disabled = !taskReadOnly;
             }
         }
         document.getElementById("taskEditButton").innerText = taskReadOnly ? "Save" : "Edit";
@@ -331,7 +364,7 @@ const ItemListComponent = (props) => {
         setDeleteTaskConfirm(false);
         if(confirm){
             if(currentTask._id != 0){
-                //deleteTask();
+                deleteTask();
             }
             setShowTaskDetails(false);
             setTaskReadOnly(true);
@@ -341,6 +374,7 @@ const ItemListComponent = (props) => {
 
     const displayTaskDetails = (task) => {
         if(task){
+            console.log(task)
             setCurrentTask(task);
             setShowTaskDetails(true);
         }
@@ -473,7 +507,8 @@ const ItemListComponent = (props) => {
                                             <td className="px-2"><input disabled={readOnly} type="checkbox" id={`task${i}MandatoryInput`} name={`task${i}MandatoryInput`} checked={t.isMandatory} className="col-span-3 self-center"/></td>
                                             <td className="px-2">placeholder</td>
                                             <td className="px-2">placeholder</td>
-                                            <td className="px-2">{t.actionType}</td>
+                                            console.log("Creating task");
+<td className="px-2">{t.actionType}</td>
                                             <td className="px-2"><button id={`task${i}DetailsButton`} onClick={() => {displayTaskDetails(t)}}>...</button></td>
                                         </tr>
                                 )})}
@@ -481,10 +516,7 @@ const ItemListComponent = (props) => {
                         </table>
                     </div>
                     <div className="flex w-full items-center justify-center justify-evenly mb-2">
-                        <button id="newTaskButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={newTask}>New Task</button>
-                        {/* <button id="editButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={saveEditButtonClick}>Edit</button>
-                        <button disabled={readOnly} id="cancelButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={cancelButtonClick}>Cancel</button>
-                        <button disabled={readOnly} id="itemDeleteButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={() => {setDeleteConfirm(true)}}>Delete</button> */}
+                        <button disabled={!selectedItem} id="newTaskButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={newTask}>New Task</button>
                     </div>
                 </div>
                 {/* Task Details pop up window */}
@@ -493,25 +525,25 @@ const ItemListComponent = (props) => {
                             <div className="flex justify-end mb-3"><button className="ml-4 w-10 px-2 text-sm border-2 border-red-400 rounded-md bg-red-300 text-white hover:bg-red-500" onClick={taskCancelButtonClick}>X</button></div>
                             <form className="grid w-full grid-cols-4 grid-rows-20 gap-y-2" id="taskForm">
                                 <label htmlFor="taskIdText" className="">Task ID:</label>
-                                <input readOnly type="text" id="taskIdText" name="taskIdText" className="col-span-3" value={currentTask._id}></input>
+                                <input readOnly type="text" id="taskIdText" name="taskIdText" className="col-span-3" defaultValue={currentTask._id}></input>
                                 <label htmlFor="titleInput" className="">Title:</label>
-                                <input readOnly type="text" id="titleInput" name="titleInput" className="col-span-3" value={currentTask.title}></input>
+                                <input readOnly type="text" id="titleInput" name="titleInput" className="col-span-3" defaultValue={currentTask.title}></input>
                                 <label htmlFor="vendorInput" className="">Service Vendor:</label>
-                                <input readOnly type="text" id="vendorInput" name="vendorInput" className="col-span-3" value={currentTask.serviceVendor}></input>
+                                <input readOnly type="text" id="vendorInput" name="vendorInput" className="col-span-3" defaultValue={currentTask.serviceVendor}></input>
                                 <label htmlFor="mandatoryInput" className="">Mandatory:</label>
-                                <input disabled type="checkbox" id="mandatoryInput" name="mandatoryInput" className="col-span-3 self-center" checked={currentTask.isMandatory}></input>
+                                <input disabled type="checkbox" id="mandatoryInput" name="mandatoryInput" className="col-span-3 self-center" defaultChecked={currentTask.isMandatory}></input>
                                 <label htmlFor="intervalInput" className="">Interval:</label>
-                                <input readOnly type="number" id="intervalInput" name="intervalInput" className="col-span-3" value={currentTask.interval}></input>
+                                <input readOnly type="number" id="intervalInput" name="intervalInput" className="col-span-3" defaultValue={currentTask.interval}></input>
                                 <label htmlFor="completeDateText" className="">Complete Date:</label>
-                                <input readOnly type="date" id="completeDateText" name="completeDateText" className="col-span-3" value={currentTask.completeDate}></input>
+                                <input readOnly type="date" id="completeDateText" name="completeDateText" className="col-span-3" defaultValue={currentTask.completeDate}></input>
                                 <label htmlFor="dueDateText" className="">Due Date:</label>
                                 <input readOnly type="date" id="dueDateText" name="dueDateText" className="col-span-3"></input>
                                 <label htmlFor="dueCheckbox" className="">Due:</label>
                                 <input disabled type="checkbox" id="dueCheckbox" name="dueCheckbox" className="col-span-3 self-center"></input>
                                 <label htmlFor="actionTypeInput" className="">Action Type:</label>
-                                <input readOnly type="text" id="actionTypeInput" name="actionTypeInput" className="col-span-3" value={currentTask.actionType}></input>
+                                <input readOnly type="text" id="actionTypeInput" name="actionTypeInput" className="col-span-3" defaultValue={currentTask.actionType}></input>
                                 <label htmlFor="taskRemarksInput" className="">Remarks:</label>
-                                <textarea readOnly id="taskRemarksInput" name="taskRemarksInput" className="col-span-3 row-span-4" value={currentTask.remarks}></textarea>
+                                <textarea readOnly id="taskRemarksInput" name="taskRemarksInput" className="col-span-3 row-span-4" defaultValue={currentTask.remarks}></textarea>
                             </form>
                             {deleteTaskConfirm && 
                                 <div id="taskDeleteConfirm" className="flex flex-row w-full items-center justify-center justify-evenly mb-2 border-2 border-gray-500 rounded-md">
@@ -522,6 +554,7 @@ const ItemListComponent = (props) => {
                             }
                             <div className="flex flex-row justify-evenly">
                                 <button id="taskEditButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={taskSaveEditButtonClick}>{taskReadOnly ? "Edit" : "Save"}</button>
+                                <button disabled={taskReadOnly} id="addTaskDataButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={newTaskData}>Add Task Data</button>
                                 <button disabled={taskReadOnly} id="taskDeleteButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={() => {setDeleteTaskConfirm(true)}}>Delete</button>
                             </div>
                         </div>

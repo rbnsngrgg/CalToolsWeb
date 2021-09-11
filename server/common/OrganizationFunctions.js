@@ -3,10 +3,11 @@ const Organization = require("../models/Organization");
 const CTItem = require("../models/CTItem");
 
 class OrganizationFunctions{
-    async OrganizationUserHasPermissionAsync(orgName, userId, permissionLevel){
+    async OrganizationUserHasPermissionAsync(orgName, userId, permissionLevel, orgId){
         return new Promise((resolve, reject) => {
             let valid = false;
-            Organization.findOne({_name_lower: orgName.toLowerCase()}, (err, org) => {
+            let orgFind = orgId ? {_id: orgId} : {_name_lower: orgName.toLowerCase()}
+            Organization.findOne(orgFind, (err, org) => {
                 if(err) {console.log(err); resolve(valid);}
                 if(org) {
                     for(let i = 0; i < org.users.length; i++){
