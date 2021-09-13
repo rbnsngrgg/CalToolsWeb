@@ -580,7 +580,7 @@ const ItemListComponent = (props) => {
                                             <td className="px-2">{t._id}</td>
                                             <td className="px-2"><input readOnly={readOnly} type="text" id={`task${i}TitleInput`} name={`task${i}TitleInput`} value={t.title}></input></td>
                                             <td className="px-2"><input disabled={readOnly} type="checkbox" id={`task${i}MandatoryInput`} name={`task${i}MandatoryInput`} checked={t.isMandatory} className="col-span-3 self-center"/></td>
-                                            <td className="px-2"><input readOnly type="date" id={`task${i}CompleteDate`} name={`task${i}CompleteDate`} className="" value={t.completeDate.split('T')[0]}></input></td>
+                                            <td className="px-2"><input readOnly type="date" id={`task${i}CompleteDate`} name={`task${i}CompleteDate`} className="" value={t.completeDate && t.completeDate.split('T')[0]}></input></td>
                                             {/* <td className="px-2">placeholder</td> */}
                                             {/* <td className="px-2"><input disabled={readOnly} type="checkbox" id={`task${i}DueBox`} name={`task${i}DueBox`} className="col-span-3 self-center"/></td> */}
                                             <td className="px-2">{t.actionType}</td>
@@ -610,7 +610,7 @@ const ItemListComponent = (props) => {
                                 <label htmlFor="intervalInput" className="">Interval:</label>
                                 <input readOnly type="number" id="intervalInput" name="intervalInput" className="col-span-3" defaultValue={currentTask.interval}></input>
                                 <label htmlFor="completeDateText" className="">Complete Date:</label>
-                                <input readOnly type="date" id="completeDateText" name="completeDateText" className="col-span-3" defaultValue={currentTask.completeDate.split('T')[0]}></input>
+                                <input readOnly type="date" id="completeDateText" name="completeDateText" className="col-span-3" defaultValue={currentTask.completeDate && currentTask.completeDate.split('T')[0]}></input>
                                 {/* <label htmlFor="dueDateText" className="">Due Date:</label>
                                 <input readOnly type="date" id="dueDateText" name="dueDateText" className="col-span-3"></input> */}
                                 <label htmlFor="dueCheckbox" className="">Due:</label>
