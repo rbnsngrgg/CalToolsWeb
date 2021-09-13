@@ -16,7 +16,6 @@ const userRouter = require("./routes/userRoutes");
 const orgRouter = require("./routes/organizationRoutes");
 const itemRouter = require("./routes/itemRoutes");
 const taskDataRouter = require("./routes/taskDataRoutes");
-var cors = require('cors')
 const app = express();
 
 app.options('*', cors());
