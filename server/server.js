@@ -63,7 +63,7 @@ app.get("/", (req, res) => {
     
 //Keep this at the bottom of the routes
 app.get("*", (req, res) => {
-    res.sendStatus(400);
+    res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
 });
 
 
