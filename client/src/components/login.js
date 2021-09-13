@@ -45,14 +45,14 @@ const Login = () => {
       }
     
     const googleLoginHandler = () => {
-      window.location.href="http://localhost:3000/users/auth/google";
+      window.location.href="https://caltools.herokuapp.com/users/auth/google";
     }
 
     return (
       <div className=" bg-gray-300 flex justify-center items-center">
         <div className="container h-screen flex justify-center items-start">
           <div className="p-8 bg-white rounded-lg max-w-6xl pb-10 mt-20">
-            <div className="flex justify-center mb-4"> <img alt="CalTools logo" src="http://localhost:3000/images/CalToolsIcon.png" width="70"/> </div>
+            <div className="flex justify-center mb-4"> <img alt="CalTools logo" src="https://caltools.herokuapp.com/images/CalToolsIcon.png" width="70"/> </div>
             <form className="auth-form" onSubmit={formSubmitHandler}>
               <input id="email" type="email" value={email} className="h-12 rounded w-full border px-3 focus:text-black focus:border-blue-100" placeholder="Email" onChange={e => setEmail(e.target.value)}/>
               <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} className="h-12 mt-3 rounded w-full border px-3 focus:text-black focus:border-blue-100" placeholder="Password"/>

@@ -24,7 +24,7 @@ const Navbar = (props) => {
     return (
         <nav className="flex items-center justify-between flex-wrap bg-gray-600 p-6">
         <div className="flex items-center flex-shrink-0 text-white mr-6">
-            <img alt="CalTools logo" src="http://localhost:3000/images/CalToolsIcon.png" className="w-1/6"></img>
+            <img alt="CalTools logo" src="https://caltools.herokuapp.com/images/CalToolsIcon.png" className="w-1/6"></img>
             <span className="font-semibold text-xl tracking-tight pl-4"><Link to="/">CalTools</Link></span>
         </div>
         {userContext.token !== null && 
