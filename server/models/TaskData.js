@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-export const TaskDataSchema = mongoose.Schema({
+const TaskDataSchema = mongoose.Schema({
     organizationId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Organization",
@@ -75,6 +75,9 @@ export const TaskDataSchema = mongoose.Schema({
         tolerance: {
             type: Number
         },
+        toleranceIsPercent: {
+            type: Boolean
+        },
         unitOfMeasure: {
             type: String,
             required: true
@@ -93,4 +96,4 @@ export const TaskDataSchema = mongoose.Schema({
 }, { timestamps: true });
 
 const TaskData = mongoose.model("TaskData", TaskDataSchema);
-export default TaskData;
+module.exports = TaskData;

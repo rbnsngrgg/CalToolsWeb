@@ -15,6 +15,7 @@ require("./authenticate");
 const userRouter = require("./routes/userRoutes");
 const orgRouter = require("./routes/organizationRoutes");
 const itemRouter = require("./routes/itemRoutes");
+const taskDataRouter = require("./routes/taskDataRoutes");
 
 const app = express();
 
@@ -50,26 +51,10 @@ app.use(passport.initialize());
 app.use("/users", userRouter);
 app.use("/organizations", orgRouter);
 app.use("/items", itemRouter);
+app.use("/taskdata", taskDataRouter);
+
 // app.use("/data", dataRoute);
 
-
-//Debug
-// app.post("/dev", async (req, res) => {
-//     console.log("Received POST to \"/dev\"");
-//     console.log(req.body)
-//     var item = new CTItem({
-//         serialNumber: req.body.serialNumber,
-//         model: req.body.model
-//     });
-//     await item.save((err) => {
-//         if(err){
-//             console.log(err);
-//             res.sendStatus(500);
-//         }
-//     });
-//     res.sendStatus(200);
-// });
-//end debug
 
 app.get("/", (req, res) => {
     if(process.env.PORT) { res.sendFile(path.resolve(__dirname, "../client/build", "index.html")); }

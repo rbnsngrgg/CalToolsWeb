@@ -8,6 +8,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const CTItem = require("../models/CTItem");
 const CTTask = require("../models/CTTask");
+const TaskData = require("../models/TaskData");
 
 router.get("/:organization", verifyUser, async(req, res) => {
     OrgFunctions.OrganizationUserHasPermissionAsync(req.params.organization, req.user._id, 0)
@@ -46,7 +47,7 @@ router.get("/:organization/:serialNumber/tasks", verifyUser, async(req,res) => {
         .then(r => {
             if(r.isValid){
                 CTItem.findOne({organizationId: r.orgId, serialNumber: req.params.serialNumber})
-                    .populate('tasks')
+                    .populate({path: 'tasks', populate: {path: 'taskData'}})
                     .then(item => {
                         res.send({tasks:item.tasks});
                     })
@@ -136,11 +137,12 @@ router.post("/tasks/save", verifyUser, async(req, res) => {
                 CTTask.create(newTask)
                 .then((t) => {
                     CTItem.findByIdAndUpdate(req.body.task.itemId, {$push:{tasks: t._id}}, {useFindAndModify: false})
-                    .then(res.sendStatus(200));
+                    .then(() => res.sendStatus(200));
                 })
             }
             else{
-                CTTask.findOneAndUpdate({_id: req.body.task._id}, newTask, {useFindAndModify:false});
+                CTTask.findByIdAndUpdate(req.body.task._id, newTask, {useFindAndModify:false})
+                .then(() => {res.sendStatus(200)});
             }
         }
         else{
