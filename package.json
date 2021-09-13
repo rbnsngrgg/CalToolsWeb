@@ -9,7 +9,7 @@
     "test-w": "jest --watchAll",
     "build": "cd client && npm install && npm run build"
   },
-  "engines":{
+  "engines": {
     "node": "15.13.0"
   },
   "repository": {
