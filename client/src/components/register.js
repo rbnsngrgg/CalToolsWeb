@@ -11,12 +11,14 @@ const Register = () => {
     const [password, setPassword] = useState("")
     // eslint-disable-next-line
     const [userContext, setUserContext] = useContext(UserContext)
+    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
+
     const formSubmitHandler = e => {
       e.preventDefault()
       setIsSubmitting(true)
       setError("")
       const genericErrorMessage = "Something went wrong! Please try again later."
-      fetch(process.env.REACT_APP_API_ENDPOINT + "users/signup", {
+      fetch(endpoint + "users/signup", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

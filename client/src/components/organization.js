@@ -7,9 +7,10 @@ const OrganizationComponent = (props) => {
     const [userContext] = useContext(UserContext);
     const [organizationNames, setOrganizationNames] = useState(null);
     const [invitations, setInvitations] = useState(null);
+    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
 
     const fetchOrganizationNames = useCallback(() => {
-      fetch(process.env.REACT_APP_API_ENDPOINT + "users/me/organizations", {
+      fetch(endpoint + "users/me/organizations", {
         method: "GET",
         credentials: "include",
         // Pass authentication token as bearer token in header
@@ -26,7 +27,7 @@ const OrganizationComponent = (props) => {
     }, [userContext.token, setOrganizationNames]);
 
     const fetchInvitations = useCallback(() => {
-      fetch(process.env.REACT_APP_API_ENDPOINT + "users/me/invitations", {
+      fetch(endpoint + "users/me/invitations", {
         method: "GET",
         credentials: "include",
         // Pass authentication token as bearer token in header
@@ -44,7 +45,7 @@ const OrganizationComponent = (props) => {
 
         
     const acceptOrRejectInvitation = (index, userSelection) => {
-      fetch(process.env.REACT_APP_API_ENDPOINT + "users/me/invitations", {
+      fetch(endpoint + "users/me/invitations", {
         method: "POST",
         credentials: "include",
         headers: { 

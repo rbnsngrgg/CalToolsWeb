@@ -9,10 +9,11 @@ const NewOrganizationComponent = (props) => {
     const [lastUserValid, setLastUserValid] = useState(true);
     const [orgNameAvailable, setOrgNameAvailable] = useState(null);
     const history = useHistory();
+    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
 
     const isUserValid = async (u) => {
         let valid = false;
-        await fetch(process.env.REACT_APP_API_ENDPOINT + "users/exists", {
+        await fetch(endpoint + "users/exists", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -31,7 +32,7 @@ const NewOrganizationComponent = (props) => {
     }
     const isOrgNameAvailable = async (o) => {
         let available = false;
-        await fetch(process.env.REACT_APP_API_ENDPOINT + "organizations/exists", {
+        await fetch(endpoint + "organizations/exists", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -52,7 +53,7 @@ const NewOrganizationComponent = (props) => {
         e.preventDefault();
         let orgName = document.getElementById("new-org-name").value;
         if(await isOrgNameAvailable(orgName)){
-            fetch(process.env.REACT_APP_API_ENDPOINT + "organizations/create", {
+            fetch(endpoint + "organizations/create", {
                 method: "POST",
                 credentials: "include",
                 // Pass authentication token as bearer token in header

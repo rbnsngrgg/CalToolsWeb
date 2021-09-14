@@ -3,9 +3,9 @@ import { UserContext } from "../context/UserContext"
 
 const Home = () => {
     const [userContext, setUserContext] = useContext(UserContext)
-
+    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
     const fetchUserDetails = useCallback(() => {
-      fetch(process.env.REACT_APP_API_ENDPOINT + "users/me", {
+      fetch(endpoint + "users/me", {
         method: "GET",
         credentials: "include",
         // Pass authentication token as bearer token in header

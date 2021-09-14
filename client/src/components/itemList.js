@@ -40,11 +40,12 @@ const ItemListComponent = (props) => {
     const [showTaskData, setShowTaskData] = useState(false);
     const [currentTask, setCurrentTask] = useState(defaultTask);
     const [taskDataParameters, setTaskDataParameters] = useState([]);
+    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
 
     const fetchItems = useCallback(() => {
         clearForm();
         if(!readOnly){ toggleEdit(); }
-        fetch(process.env.REACT_APP_API_ENDPOINT + "items/" + document.getElementById("orgSelect").value, {
+        fetch(endpoint + "items/" + document.getElementById("orgSelect").value, {
           method: "GET",
           credentials: "include",
           // Pass authentication token as bearer token in header
@@ -68,7 +69,7 @@ const ItemListComponent = (props) => {
       }, [userContext.token, setItems, setCategories, readOnly]);
 
       const fetchTasks = useCallback(() => {
-        fetch(process.env.REACT_APP_API_ENDPOINT + "items/" + document.getElementById("orgSelect").value + "/" + document.getElementById("itemSelect").value + "/tasks", {
+        fetch(endpoint + "items/" + document.getElementById("orgSelect").value + "/" + document.getElementById("itemSelect").value + "/tasks", {
           method: "GET",
           credentials: "include",
           // Pass authentication token as bearer token in header
@@ -86,7 +87,7 @@ const ItemListComponent = (props) => {
 
       const fetchItemDetails = useCallback(() => {
           if(!document.getElementById("itemSelect").value){return;}
-        fetch(process.env.REACT_APP_API_ENDPOINT + "items/" + document.getElementById("orgSelect").value + "/" + document.getElementById("itemSelect").value, {
+        fetch(endpoint + "items/" + document.getElementById("orgSelect").value + "/" + document.getElementById("itemSelect").value, {
             method: "GET",
             credentials: "include",
             // Pass authentication token as bearer token in header
@@ -126,7 +127,7 @@ const ItemListComponent = (props) => {
             remarks: document.getElementById("remarksInput").value,
             tasks: currentTasks,
         }
-        fetch(process.env.REACT_APP_API_ENDPOINT + "items/save", {
+        fetch(endpoint + "items/save", {
             method: "POST",
             credentials: "include",
             // Pass authentication token as bearer token in header
@@ -154,7 +155,7 @@ const ItemListComponent = (props) => {
     }
 
     const saveTask = async (task) => {
-        fetch(process.env.REACT_APP_API_ENDPOINT + "items/tasks/save", {
+        fetch(endpoint + "items/tasks/save", {
             method: "POST",
             credentials: "include",
             // Pass authentication token as bearer token in header
@@ -201,7 +202,7 @@ const ItemListComponent = (props) => {
             remarks: document.getElementById("dataRemarksInput").value,
             findings: taskDataParameters
         }
-        fetch(process.env.REACT_APP_API_ENDPOINT + "taskdata/save", {
+        fetch(endpoint + "taskdata/save", {
             method: "POST",
             credentials: "include",
             // Pass authentication token as bearer token in header
@@ -228,7 +229,7 @@ const ItemListComponent = (props) => {
     }
   
     const fetchOrganizationNames = useCallback(() => {
-        fetch(process.env.REACT_APP_API_ENDPOINT + "users/me/organizations", {
+        fetch(endpoint + "users/me/organizations", {
             method: "GET",
             credentials: "include",
             // Pass authentication token as bearer token in header
@@ -245,7 +246,7 @@ const ItemListComponent = (props) => {
     }, [userContext.token, setOrganizationNames]);
     
     const deleteItem = useCallback(() => {
-        fetch(process.env.REACT_APP_API_ENDPOINT + "items/delete", {
+        fetch(endpoint + "items/delete", {
             method: "POST",
             credentials: "include",
             // Pass authentication token as bearer token in header
@@ -270,7 +271,7 @@ const ItemListComponent = (props) => {
     }, [userContext.token]);
 
     const deleteTask = useCallback(() => {
-        fetch(process.env.REACT_APP_API_ENDPOINT + "items/tasks/delete", {
+        fetch(endpoint + "items/tasks/delete", {
             method: "POST",
             credentials: "include",
             // Pass authentication token as bearer token in header

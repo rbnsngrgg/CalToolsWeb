@@ -14,8 +14,10 @@ import ItemListComponent from "./components/itemList";
 
 function App() {
   const [userContext, setUserContext] = useContext(UserContext)
+  const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
+
   const fetchUserDetails = useCallback(() => {
-    fetch(process.env.REACT_APP_API_ENDPOINT + "users/me", {
+    fetch(endpoint + "users/me", {
       method: "GET",
       credentials: "include",
       // Pass authentication token as bearer token in header
@@ -45,7 +47,7 @@ function App() {
   }, [setUserContext, userContext.token])
 
   const verifyUser = useCallback(() => {
-    fetch(process.env.REACT_APP_API_ENDPOINT + "users/refreshToken", {
+    fetch(endpoint + "users/refreshToken", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

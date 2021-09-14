@@ -6,8 +6,10 @@ import { useHistory } from "react-router";
 const Navbar = (props) => {
     const [userContext, setUserContext] = useContext(UserContext);
     const history = useHistory();
+    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
+
     const logoutHandler = async () => {
-        await fetch(process.env.REACT_APP_API_ENDPOINT + "users/logout", {
+        await fetch(endpoint + "users/logout", {
             credentials: "include",
             headers: {
             "Content-Type": "application/json",
