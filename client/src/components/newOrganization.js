@@ -9,7 +9,7 @@ const NewOrganizationComponent = (props) => {
     const [lastUserValid, setLastUserValid] = useState(true);
     const [orgNameAvailable, setOrgNameAvailable] = useState(null);
     const history = useHistory();
-    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
 
     const isUserValid = async (u) => {
         let valid = false;

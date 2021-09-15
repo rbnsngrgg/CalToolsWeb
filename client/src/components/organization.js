@@ -7,7 +7,7 @@ const OrganizationComponent = (props) => {
     const [userContext] = useContext(UserContext);
     const [organizationNames, setOrganizationNames] = useState(null);
     const [invitations, setInvitations] = useState(null);
-    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
 
     const fetchOrganizationNames = useCallback(() => {
       fetch(endpoint + "users/me/organizations", {
@@ -24,7 +24,7 @@ const OrganizationComponent = (props) => {
           let data = await response.json();
           setOrganizationNames(data);
         }});
-    }, [userContext.token, setOrganizationNames]);
+    }, [userContext.token, setOrganizationNames, endpoint]);
 
     const fetchInvitations = useCallback(() => {
       fetch(endpoint + "users/me/invitations", {
@@ -41,7 +41,7 @@ const OrganizationComponent = (props) => {
           let data = await response.json();
           setInvitations(data);
         }});
-    }, [userContext.token, setInvitations]);
+    }, [userContext.token, setInvitations, endpoint]);
 
         
     const acceptOrRejectInvitation = (index, userSelection) => {

@@ -3,7 +3,7 @@ import { UserContext } from "../context/UserContext"
 
 const Home = () => {
     const [userContext, setUserContext] = useContext(UserContext)
-    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
     const fetchUserDetails = useCallback(() => {
       fetch(endpoint + "users/me", {
         method: "GET",
@@ -32,7 +32,7 @@ const Home = () => {
           }
         }
       })
-    }, [setUserContext, userContext.token])
+    }, [setUserContext, userContext.token, endpoint])
 
     useEffect(() => {
       // fetch only when user details are not present

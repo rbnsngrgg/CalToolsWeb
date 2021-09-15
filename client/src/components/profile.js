@@ -1,7 +1,8 @@
-import React, { useCallback, useContext, useEffect } from "react"
+import React, { useContext, useEffect } from "react"
 import { UserContext } from "../context/UserContext"
 
 const ProfileComponent = (props) => {
+    // eslint-disable-next-line
     const [userContext, setUserContext] = useContext(UserContext);
 
     useEffect(() => {

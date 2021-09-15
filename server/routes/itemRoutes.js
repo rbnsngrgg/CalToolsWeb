@@ -10,6 +10,7 @@ const CTItem = require("../models/CTItem");
 const CTTask = require("../models/CTTask");
 const TaskData = require("../models/TaskData");
 
+//Get a lits of an organization's items
 router.get("/:organization", verifyUser, async(req, res) => {
     OrgFunctions.OrganizationUserHasPermissionAsync(req.params.organization, req.user._id, 0)
         .then(r => {
@@ -30,6 +31,7 @@ router.get("/:organization", verifyUser, async(req, res) => {
         })
 });
 
+//Get one item's details
 router.get("/:organization/:serialNumber", verifyUser, async(req,res) => {
     OrgFunctions.OrganizationUserHasPermissionAsync(req.params.organization, req.user._id, 0)
         .then(r => {
@@ -39,9 +41,10 @@ router.get("/:organization/:serialNumber", verifyUser, async(req,res) => {
                         res.send({item:item});
                     })
             }
-        })
+        });
 });
 
+//Get specific item's tasks
 router.get("/:organization/:serialNumber/tasks", verifyUser, async(req,res) => {
     OrgFunctions.OrganizationUserHasPermissionAsync(req.params.organization, req.user._id, 0)
         .then(r => {
@@ -55,6 +58,7 @@ router.get("/:organization/:serialNumber/tasks", verifyUser, async(req,res) => {
         })
 });
 
+//Save an item (create or update)
 router.post("/save", verifyUser, async(req, res) => {
     let reqPermission = 2
     //Check if item exists in org. If it exists, permission of at least 1 is required. If not, permission of at least 2
@@ -99,6 +103,7 @@ router.post("/save", verifyUser, async(req, res) => {
         })
 });
 
+//Delete an item
 router.post("/delete", verifyUser, async(req, res) => {
     OrgFunctions.OrganizationUserHasPermissionAsync(req.body.organization, req.user._id, 2)
     .then(r => {
@@ -117,55 +122,4 @@ router.post("/delete", verifyUser, async(req, res) => {
     .catch(() => res.sendStatus(500));
 });
 
-router.post("/tasks/save", verifyUser, async(req, res) => {
-    let reqPermission = String(req.body.task._id) === "0" ? 2 : 1;
-    OrgFunctions.OrganizationUserHasPermissionAsync(req.body.organization, req.user._id, reqPermission)
-    .then(r => {
-        if(r.isValid){
-            let newTask = {
-                itemId: req.body.task.itemId,
-                organizationId: r.orgId,
-                title: req.body.task.title,
-                serviceVendor: req.body.task.serviceVendor,
-                isMandatory: req.body.task.isMandatory,
-                interval: req.body.task.interval,
-                completeDate: req.body.task.completeDate,
-                actionType: req.body.task.actionType,
-                remarks: req.body.task.remarks
-            }
-            if(reqPermission === 2){
-                CTTask.create(newTask)
-                .then((t) => {
-                    CTItem.findByIdAndUpdate(req.body.task.itemId, {$push:{tasks: t._id}}, {useFindAndModify: false})
-                    .then(() => res.sendStatus(200));
-                })
-            }
-            else{
-                CTTask.findByIdAndUpdate(req.body.task._id, newTask, {useFindAndModify:false})
-                .then(() => {res.sendStatus(200)});
-            }
-        }
-        else{
-            res.sendStatus(403);
-        }
-    })
-    .catch(() => res.sendStatus(500));
-})
-
-router.post("/tasks/delete", verifyUser, async(req, res) => {
-    CTTask.findById(req.body.taskId)
-    .then(task => {
-        OrgFunctions.OrganizationUserHasPermissionAsync("",req.user._id,2,task.organizationId)
-        .then(r => {
-            if(r.isValid){
-                CTTask.findByIdAndDelete(task._id, {useFindAndModify: false})
-                .then(res.sendStatus(200));
-            }
-            else{
-                res.sendStatus(403);
-            }
-        })
-    })
-    .catch(() => res.sendStatus(500))
-})
 module.exports = router;

@@ -8,14 +8,23 @@ const jwt = require("jsonwebtoken");
 
 router.post("/signup", (req, res, next) => {
   // Verify that first name is not empty
-  if (!req.body.firstName) {
-    res.statusCode = 500
+  if (!req.body.firstName || !req.body.lastName) {
+    res.statusCode = 400;
     res.send({
-      name: "FirstNameError",
-      message: "The first name is required",
+      success: false,
+      name: "NameError",
+      message: "Both first and last name are required.",
+    });
+  }
+  else if(!req.body.email){
+    res.statusCode = 400;
+    res.send({
+      success: false,
+      name: "EmailError",
+      message: "An email address is required"
     })
-  } else {
-    console.log("Registering user");
+  }
+  else {
     User.register(
       new User({ email: req.body.email }),
       req.body.password,
@@ -24,7 +33,7 @@ router.post("/signup", (req, res, next) => {
           console.log("Error registering user");
           console.log(err);
           res.statusCode = 500
-          res.send(err)
+          res.send({success: false, error:err})
         } else {
           user.firstName = req.body.firstName
           user.lastName = req.body.lastName || ""

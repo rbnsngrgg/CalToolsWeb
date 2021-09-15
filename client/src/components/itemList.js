@@ -1,10 +1,8 @@
 import React, { useCallback, useContext, useEffect, useState } from "react"
 import { UserContext } from "../context/UserContext"
-import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
+// import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 
 const ItemListComponent = (props) => {
-    let contextTrigger = null;
-    let contextMenuTriggeredItem = null;
     let defaultTask = {
         _id: 0,
         title: "New Task",
@@ -28,6 +26,7 @@ const ItemListComponent = (props) => {
     const [errorMessage, setErrorMessage] = useState("");
     const [deleteConfirm, setDeleteConfirm] = useState(false);
     const [deleteTaskConfirm, setDeleteTaskConfirm] = useState(false);
+    // eslint-disable-next-line
     const [userContext, setUserContext] = useContext(UserContext);
     const [items, setItems] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -40,7 +39,7 @@ const ItemListComponent = (props) => {
     const [showTaskData, setShowTaskData] = useState(false);
     const [currentTask, setCurrentTask] = useState(defaultTask);
     const [taskDataParameters, setTaskDataParameters] = useState([]);
-    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
 
     const fetchItems = useCallback(() => {
         clearForm();
@@ -66,7 +65,8 @@ const ItemListComponent = (props) => {
             }
             setCategories(newCategories);
           }});
-      }, [userContext.token, setItems, setCategories, readOnly]);
+          // eslint-disable-next-line
+      }, [userContext.token, setItems, setCategories, readOnly, endpoint]);
 
       const fetchTasks = useCallback(() => {
         fetch(endpoint + "items/" + document.getElementById("orgSelect").value + "/" + document.getElementById("itemSelect").value + "/tasks", {
@@ -83,7 +83,7 @@ const ItemListComponent = (props) => {
             let data = await response.json();
             setCurrentTasks(data.tasks);
           }});
-      }, [userContext.token, setCurrentTasks]);
+      }, [userContext.token, setCurrentTasks, endpoint]);
 
       const fetchItemDetails = useCallback(() => {
           if(!document.getElementById("itemSelect").value){return;}
@@ -111,7 +111,7 @@ const ItemListComponent = (props) => {
               document.getElementById("itemGroupInput").value = data.item.itemGroup;
               document.getElementById("remarksInput").value = data.item.remarks;
             }});
-        }, [userContext.token, setSelectedItem])
+        }, [userContext.token, setSelectedItem, endpoint])
 
       const saveItem = async () => {
         let itemData = {
@@ -155,7 +155,7 @@ const ItemListComponent = (props) => {
     }
 
     const saveTask = async (task) => {
-        fetch(endpoint + "items/tasks/save", {
+        fetch(endpoint + "tasks/save", {
             method: "POST",
             credentials: "include",
             // Pass authentication token as bearer token in header
@@ -243,7 +243,7 @@ const ItemListComponent = (props) => {
             let data = await response.json();
             setOrganizationNames(data);
             }});
-    }, [userContext.token, setOrganizationNames]);
+    }, [userContext.token, setOrganizationNames, endpoint]);
     
     const deleteItem = useCallback(() => {
         fetch(endpoint + "items/delete", {
@@ -268,10 +268,10 @@ const ItemListComponent = (props) => {
                 setErrorMessage(text);
             }
         })
-    }, [userContext.token]);
+    }, [userContext.token, endpoint, fetchItems]);
 
     const deleteTask = useCallback(() => {
-        fetch(endpoint + "items/tasks/delete", {
+        fetch(endpoint + "tasks/delete", {
             method: "POST",
             credentials: "include",
             // Pass authentication token as bearer token in header
@@ -295,18 +295,7 @@ const ItemListComponent = (props) => {
                 setErrorMessage(text);
             }
         })
-    }, [userContext.token]);
-
-    const handleClick = (e,data) => {
-        console.log(contextMenuTriggeredItem);
-    }
-
-    const toggleMenu = (e,i) => {
-        if(contextTrigger) {
-            contextMenuTriggeredItem = i;
-            contextTrigger.handleContextClick(e);
-        }
-    };
+    }, [userContext.token, endpoint, fetchItems, fetchTasks]);
 
     const newItem = () => {
         clearForm();
@@ -384,6 +373,7 @@ const ItemListComponent = (props) => {
     }
 
     const clearForm = () => {
+        setCurrentTasks([]);
         let form = document.getElementById("itemForm");
         for(let i = 0; i < form.children.length; i++){
             if(form.children[i].type === "text" || form.children[i].type === "textarea"){
@@ -506,19 +496,6 @@ const ItemListComponent = (props) => {
                     </div>
                 </div>
                 <div className="flex flex-col p-2 border-4 border-gray-400 rounded-lg w-full px-4 mt-2 justify-center">
-                    <ContextMenuTrigger id="itemContextMenu" ref={c => contextTrigger = c}><div></div></ContextMenuTrigger>
-                    <ContextMenu id="itemContextMenu">
-                        <MenuItem data={{foo: 'bar'}} onClick={handleClick}>
-                            ContextMenu Item 1
-                        </MenuItem>
-                        <MenuItem data={{foo: 'bar'}} onClick={handleClick}>
-                            ContextMenu Item 2
-                        </MenuItem>
-                        <MenuItem divider />
-                        <MenuItem data={{foo: 'bar'}} onClick={handleClick}>
-                            ContextMenu Item 3
-                        </MenuItem>
-                    </ContextMenu>
                     <div className="flex w-full items-center justify-center justify-evenly mb-2">
                         <button id="newItemButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={newItem}>New Item</button>
                         <button id="editButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={saveEditButtonClick}>Edit</button>
@@ -581,7 +558,7 @@ const ItemListComponent = (props) => {
                                             <td className="px-2">{t._id}</td>
                                             <td className="px-2"><input readOnly={readOnly} type="text" id={`task${i}TitleInput`} name={`task${i}TitleInput`} value={t.title}></input></td>
                                             <td className="px-2"><input disabled={readOnly} type="checkbox" id={`task${i}MandatoryInput`} name={`task${i}MandatoryInput`} checked={t.isMandatory} className="col-span-3 self-center"/></td>
-                                            <td className="px-2"><input readOnly type="date" id={`task${i}CompleteDate`} name={`task${i}CompleteDate`} className="" value={t.completeDate && t.completeDate.split('T')[0]}></input></td>
+                                            <td className="px-2"><input readOnly type="date" id={`task${i}CompleteDate`} name={`task${i}CompleteDate`} className="" value={(t.completeDate && t.completeDate.split('T')[0]) || ""}></input></td>
                                             {/* <td className="px-2">placeholder</td> */}
                                             {/* <td className="px-2"><input disabled={readOnly} type="checkbox" id={`task${i}DueBox`} name={`task${i}DueBox`} className="col-span-3 self-center"/></td> */}
                                             <td className="px-2">{t.actionType}</td>

@@ -11,7 +11,7 @@ const Register = () => {
     const [password, setPassword] = useState("")
     // eslint-disable-next-line
     const [userContext, setUserContext] = useContext(UserContext)
-    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
 
     const formSubmitHandler = e => {
       e.preventDefault()
@@ -79,7 +79,7 @@ const Register = () => {
             onChange={e => setPassword(e.target.value)}
             value={password}
           />
-        <button intent="primary" text="Register" fill type="submit" disabled={isSubmitting}>
+        <button intent="primary" text="Register" type="submit" disabled={isSubmitting}>
             {`${isSubmitting ? "Registering" : "Register"}`}
         </button>
       </form>

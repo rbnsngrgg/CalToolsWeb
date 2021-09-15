@@ -1,0 +1,91 @@
+const app = require("../server");
+import Organization from "../models/Organization";
+import CTItem from "../models/CTItem";
+import CTTask from "../models/CTTask";
+import { expect } from "@jest/globals";
+//const CTItem = require("../models/CTItem");
+const mongoose = require("mongoose");
+const supertest = require("supertest");
+
+// const item1 = {
+//     organizationId: org._id,
+//     serialNumber: "TestItem1",
+//     itemCategory: "Production Items",
+//     inOperation: true
+// }
+// //Item2 itemCategory should default to "General Items"
+// const item2 = {
+//     organizationId: org._id,
+//     serialNumber: "TestItem2",
+//     inOperation: false
+// }
+// async function insertTestObjects(){
+//     await Organization.create({
+//         name: "TestOrg",
+//         _name_lower: "testorg"
+//     })
+//     .then(org => {
+//         CTItem.create({...item1, organizationId:org._id})
+//         .then(() => CTItem.create({...item2, organizationId:org._id}));
+//     })
+// }
+
+
+// beforeEach((done) => {
+//     mongoose.connect("mongodb://127.0.0.1:27017/TestDb",
+//       { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true },
+//       async () => {
+//           await insertTestObjects();
+//           done();
+//         });
+// });
+// afterEach((done) => {
+// mongoose.connection.db.dropDatabase(() => {
+//     mongoose.connection.close(() => done())
+//     });
+// });
+
+
+// test("GET /api/items/:organization", async () => {
+//     const org = await Organization.findOne({name: "TestOrg"});
+//     const item = new CTItem({
+//         organizationId: org._id,
+//         serialNumber: "TestItem1",
+//         location: "TestArea",
+//         manufacturer: "GHR",
+//         itemDescription: "Test CTItem",
+//         inOperation: false,
+//         model: "111223",
+//         itemGroup: "Test Items",
+//         remarks: "If this is still in the database, tests are not running properly",
+//         isStandardEquipment: true,
+//         certificateNumber: "TestCert1"
+//     });
+//     await item.save();
+//     await supertest(app).get("/api/items/")
+//       .expect(200)
+//       .then((response) => {
+//         // Check type and length
+//         expect(Array.isArray(response.body)).toBeTruthy();
+//         expect(response.body.length).toEqual(1);
+  
+//         // Check data
+//         expect(response.body[0]._id).toBe(item._id.toString());
+//         expect(response.body[0].organizationId).toBe(org._id.toString());
+//         expect(response.body[0].serialNumber).toBe(item.serialNumber);
+//         expect(response.body[0].location).toBe(item.location);
+//         expect(response.body[0].manufacturer).toBe(item.manufacturer);
+//         expect(response.body[0].itemDescription).toBe(item.itemDescription);
+//         expect(response.body[0].inService).toBe(item.inService); 
+//         expect(response.body[0].model).toBe(item.model);
+//         expect(response.body[0].itemGroup).toBe(item.itemGroup);
+//         expect(response.body[0].remarks).toBe(item.remarks);
+//         expect(response.body[0].isStandardEquipment).toBe(item.isStandardEquipment);
+//         expect(response.body[0].certificateNumber).toBe(item.certificateNumber);
+//         // Check automatic timestamps
+//         expect(response.body[0].createdAt).toBeDefined()
+//         expect(response.body[0].createdAt.length).toBeGreaterThan(0)
+//         expect(response.body[0].updatedAt).toBeDefined()
+//         expect(response.body[0].updatedAt.length).toBeGreaterThan(0)
+//       });
+//   });

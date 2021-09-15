@@ -9,7 +9,7 @@ const Login = () => {
     // eslint-disable-next-line
     const [userContext, setUserContext] = useContext(UserContext)
     const [password, setPassword] = useState("")
-    const endpoint = process.env.REACT_APP_API_ENDPOINT || process.env.DEBUG_REACT_APP_API_ENDPOINT
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
 
     const formSubmitHandler = e => {
         e.preventDefault()
@@ -59,7 +59,7 @@ const Login = () => {
               <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} className="h-12 mt-3 rounded w-full border px-3 focus:text-black focus:border-blue-100" placeholder="Password"/>
               {error !== "" && <label className="text-red-500	">{error}</label> }
               <div className="flex justify-end items-center mt-2"><Link to="/register" className="text-gray-400 hover:text-gray-600">Register</Link></div>
-              <div className="flex justify-end items-center mt-2"><a className="text-gray-400 hover:text-gray-600">Forgot password?</a> </div>
+              {/* <div className="flex justify-end items-center mt-2"><a className="text-gray-400 hover:text-gray-600">Forgot password?</a> </div> */}
               <button intent="primary" type="submit" disabled={isSubmitting} className="uppercase h-12 mt-3 text-white w-full rounded bg-gray-700 hover:bg-gray-800">
                 {`${isSubmitting ? "Logging In" : "Log In"}`}
               </button>
