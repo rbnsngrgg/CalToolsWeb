@@ -64,7 +64,7 @@ router.post("/login", passport.authenticate("local"), (req, res, next) => {
         user.save((err, user) => {
           if (err) {
             res.statusCode = 500
-            res.send(err)
+            res.send({success: false, error: err});
           } else {
             res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS)
             res.send({ success: true, token })
@@ -107,7 +107,6 @@ router.get("/auth/google/caltoolsweb",
 router.post("/refreshToken", (req, res, next) => {
   const { signedCookies = {} } = req
   const { refreshToken } = signedCookies
-
   if (refreshToken) {
     try {
       const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
@@ -172,7 +171,7 @@ router.get("/me", verifyUser, async (req, res, next) => {
 });
 
 router.get("/me/organizations", verifyUser, async (req, res) => {
-  getOrgNames(req.user.organizations).then((names) => {res.send(JSON.stringify(names));});
+  getOrgNames(req.user.organizations).then((names) => {res.send(names);});
 });
 
 router.get("/me/invitations", verifyUser, async (req, res) => {

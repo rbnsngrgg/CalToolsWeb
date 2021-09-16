@@ -15,7 +15,7 @@ async function insertTestOrg(){
 }
 
 beforeEach((done) => {
-    mongoose.connect("mongodb://127.0.0.1:27017/TestDb",
+    mongoose.connect("mongodb://127.0.0.1:27017/CTItemModelTestDb",
       { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true },
       async () => {await insertTestOrg(); done();})
 });

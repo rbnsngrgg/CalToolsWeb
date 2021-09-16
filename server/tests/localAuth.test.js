@@ -1,11 +1,8 @@
 const app = require("../server");
-import Organization from "../models/Organization";
-import CTItem from "../models/CTItem";
-import CTTask from "../models/CTTask";
 import { expect } from "@jest/globals";
 import { response } from "express";
+import { JsonWebTokenError } from "jsonwebtoken";
 import User from "../models/User";
-//const CTItem = require("../models/CTItem");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
 
@@ -15,16 +12,25 @@ const testUser = {
     email: "user1@testusers.com",
     password: "test1234"
 }
+let cookie;
+let token;
 
-beforeEach((done) => {
-    mongoose.connect("mongodb://127.0.0.1:27017/TestDb",
-      { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true },
-      async () => {done();})
+beforeAll(async () => {
+    await mongoose.connect("mongodb://127.0.0.1:27017/localAuthTestDb",
+    { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
 });
-afterEach((done) => {
-mongoose.connection.db.dropDatabase(() => {
-    mongoose.connection.close(() => done())
-    });
+
+beforeEach(async () => {
+    cookie = null;
+    token = null;
+});
+afterEach(async () => {
+    await User.deleteMany();
+});
+
+afterAll(async () => {
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.connection.close();
 });
 
 test("Create Valid User", async () => {
@@ -63,4 +69,19 @@ test("Log in valid user", async () => {
     const res = await supertest(app).post("/api/users/login")
         .send({email: testUser.email, password: testUser.password});
     expect(res.body.success).toBe(true);
+});
+
+test("Test refresh token", async () => {
+    let agent = supertest.agent(app);
+    await agent.post("/api/users/signup").send(testUser);
+    //Initial login cookie
+    const res = await agent.post("/api/users/login")
+        .send({email: testUser.email, password: testUser.password});
+    cookie = res.headers['set-cookie'];
+    //Get new token
+    const refreshRes = await agent.post("/api/users/refreshToken")
+    .set('Cookie', cookie)
+    .send();
+    expect(refreshRes.body.token).toBeTruthy();
+    expect(refreshRes.body.token !== res.body.token);
 });
