@@ -44,6 +44,33 @@ router.get("/:organization/:serialNumber", verifyUser, async(req,res) => {
         });
 });
 
+//for items with readPublic set to true
+router.get("/:organization/public/:serialNumber", async (req, res) => {
+    Organization.findOne({_name_lower: req.params.organization.toLowerCase()})
+    .then(org => {
+        if(org){
+            CTItem.findOne({serialNumber: req.params.serialNumber, organizationId: org._id})
+            .then(item => {
+                if(item){
+                    if(item.readPublic){
+                        res.send({item:item});
+                    }
+                    else{
+                        res.sendStatus(401);
+                    }
+                }
+                else{
+                    res.sendStatus(401);
+                }
+            })
+        }
+        else{
+            res.sendStatus(400);
+        }
+    })
+    .catch(() => {res.sendStatus(500);})
+});
+
 //Get specific item's tasks
 router.get("/:organization/:serialNumber/tasks", verifyUser, async(req,res) => {
     OrgFunctions.OrganizationUserHasPermissionAsync(req.params.organization, req.user._id, 0)
@@ -83,7 +110,8 @@ router.post("/save", verifyUser, async(req, res) => {
                         itemGroup: req.body.item.itemGroup || "",
                         remarks: req.body.item.remarks || "",
                         isStandardEquipment: req.body.item.isStandardEquipment || false,
-                        certificateNumber: req.body.item.certificateNumber || ""
+                        certificateNumber: req.body.item.certificateNumber || "",
+                        readPublic: req.body.item.readPublic || false
                     }
                     if(reqPermission == 2){
                         CTItem.create(item);

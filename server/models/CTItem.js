@@ -50,6 +50,10 @@ const CTItemSchema = mongoose.Schema({
         type: String,
         default: ""
     },
+    readPublic: {
+        type: Boolean,
+        default: false
+    },
     tasks: [{type: mongoose.Schema.Types.ObjectId, ref: "CTTask"}]
 }, { timestamps: true });
 

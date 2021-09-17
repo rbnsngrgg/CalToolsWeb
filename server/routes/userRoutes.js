@@ -182,7 +182,7 @@ router.get("/me/invitations", verifyUser, async (req, res) => {
     if(user){
       let orgIds = user.invitations.map(i => { return i.organization; });
       getOrgNames(orgIds).then(names => {
-        res.send(JSON.stringify(names.map((n,i) => {return {name: n, permissions: user.invitations[i].permissions, id: user.invitations[i].organization}})));
+        res.send(names.map((n,i) => {return {name: n, permissions: user.invitations[i].permissions, id: user.invitations[i].organization}}));
       })
     }
   });

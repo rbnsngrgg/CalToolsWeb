@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect } from "react";
 import { UserContext } from "./context/UserContext";
 import './App.css';
-import {BrowserRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
+import {BrowserRouter, BrowserRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import Login from './components/login';
 import Register from './components/register';
 import Home from "./components/home";
@@ -11,6 +11,7 @@ import OrganizationComponent from "./components/organization";
 import NewOrganizationComponent from "./components/newOrganization";
 import ProfileComponent from "./components/profile";
 import ItemListComponent from "./components/itemList";
+import SingleItemPage from "./components/singleItemPage";
 
 function App() {
   const [userContext, setUserContext] = useContext(UserContext)
@@ -88,6 +89,7 @@ function App() {
 
   return (
     <div className="App bg-gray-300 h-screen overflow-auto">
+      <BrowserRouter>
         <Router className="h-full">
           <Navbar  fetchUserDetails={fetchUserDetails}/>
           {userContext.token === null ?
@@ -96,6 +98,7 @@ function App() {
             <Route exact path="/"><Redirect to="/login"/></Route>
             <Route exact path="/register" component={Register}/>
             <Route exact path="/login" component={Login}/>
+            <Route exact path="/item/:organization/:item" component={SingleItemPage}/>
             <Route><Redirect to="/login"/></Route>
             </Switch>
           </>) : 
@@ -107,12 +110,14 @@ function App() {
             <Route exact path="/organization" render={() => (<OrganizationComponent fetchUserDetails={fetchUserDetails}/>)}/>
             <Route exact path="/organization/new" render={() => (<NewOrganizationComponent fetchUserDetails={fetchUserDetails}/>)}/>
             <Route exact path="/users/me/profile" render={() => (<ProfileComponent fetchUserDetails={fetchUserDetails}/>)}/>
+            <Route exact path="/item/:organization/:item" component={SingleItemPage}/>
             <Route><Redirect to="/"/></Route>
             </Switch>
             </>)
             :<Loader/>
           }
         </Router>
+      </BrowserRouter>
     </div>
   )
 }

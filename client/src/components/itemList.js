@@ -110,6 +110,7 @@ const ItemListComponent = (props) => {
               document.getElementById("inOperationInput").checked = data.item.inOperation;
               document.getElementById("itemGroupInput").value = data.item.itemGroup;
               document.getElementById("remarksInput").value = data.item.remarks;
+              document.getElementById("publicInput").checked = data.item.readPublic;
             }});
         }, [userContext.token, setSelectedItem, endpoint])
 
@@ -126,6 +127,7 @@ const ItemListComponent = (props) => {
             itemGroup: document.getElementById("itemGroupInput").value,
             remarks: document.getElementById("remarksInput").value,
             tasks: currentTasks,
+            readPublic: document.getElementById("publicInput").checked
         }
         fetch(endpoint + "items/save", {
             method: "POST",
@@ -347,6 +349,7 @@ const ItemListComponent = (props) => {
                 completeDate: document.getElementById("completeDateText").value,
                 actionType: document.getElementById("actionTypeInput").value,
                 remarks: document.getElementById("taskRemarksInput").value,
+                readPublic: document.getElementById("publicInput").checked,
                 dateOverride: ""
             }
             saveTask(task);
@@ -489,7 +492,7 @@ const ItemListComponent = (props) => {
             <div className="flex flex-col justify-start items-center w-3/5 my-8">
                 <div className="inline-block relative w-64 mt-3">
                     <select disabled={showTaskDetails} id="orgSelect" onChange={fetchItems} className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-                        {(organizationNames && organizationNames.map((x, i) => <option key={i} value={x}>{x}</option>))}
+                        {(organizationNames && organizationNames.map((x, i) => <option key={`org${i}`} value={x}>{x}</option>))}
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 mt-1">
                         <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
@@ -515,7 +518,7 @@ const ItemListComponent = (props) => {
                             <button className="ml-4 px-2 text-sm border-2 border-red-400 rounded-md bg-red-300 text-white hover:bg-red-500" onClick={() => setErrorMessage("")}>X</button>
                         </div>
                     }
-                    {/* Item detaisl form */}
+                    {/* Item details form */}
                     <form className="grid w-full grid-cols-4 grid-rows-20 gap-y-2" id="itemForm">
                         <label htmlFor="categoryInput" className="">Item Category:</label>
                         <input readOnly type="text" id="categoryInput" name="categoryInput" className="col-span-3" placeholder="Ex. Production Equipment"></input>
@@ -533,6 +536,8 @@ const ItemListComponent = (props) => {
                         <input disabled type="checkbox" id="standardEquipmentInput" name="standardEquipmentInput" className="col-span-3 self-center"></input>
                         <label htmlFor="inOperationInput" className="">In Operation:</label>
                         <input disabled type="checkbox" id="inOperationInput" name="inOperationInput" className="col-span-3 self-center"></input>
+                        <label htmlFor="publicInput" className="">Public can read data?</label>
+                        <input disabled type="checkbox" id="publicInput" name="publicInput" className="col-span-3 self-center"></input>
                         <label htmlFor="itemGroupInput" className="">Item Group:</label>
                         <input readOnly type="text" id="itemGroupInput" name="itemGroupInput" className="col-span-3"></input>
                         <label htmlFor="remarksInput" className="">Remarks:</label>
