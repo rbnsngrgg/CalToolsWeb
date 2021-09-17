@@ -46,7 +46,7 @@ const Login = () => {
       }
     
     const googleLoginHandler = () => {
-      window.location.href="https://caltools.herokuapp.com/users/auth/google";
+      window.location.href=endpoint + "users/auth/google";
     }
 
     return (
