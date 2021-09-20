@@ -49,6 +49,7 @@ app.use((req, res, next) => {
         if(!process.env.DEBUG){
             //console.log(req.headers);
             if(!req.secure){
+                console.log(req.protocol);
                 //console.log(`https://${req.headers.host}${req.url}`);
                 return res.redirect(`https://${req.headers.host}${req.url}`);
             }
