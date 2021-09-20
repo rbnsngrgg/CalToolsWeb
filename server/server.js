@@ -48,8 +48,7 @@ app.use((req, res, next) => {
     if(req.headers.host === host){
         if(!process.env.DEBUG){
             //console.log(req.headers);
-            if(!req.secure){
-                console.log(req.protocol);
+            if(req.get('x-forwarded-proto') === "http" && !req.secure){
                 //console.log(`https://${req.headers.host}${req.url}`);
                 return res.redirect(`https://${req.headers.host}${req.url}`);
             }
