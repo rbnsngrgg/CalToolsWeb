@@ -42,6 +42,24 @@ app.use(cors(corsOptions));
 
 app.use(passport.initialize());
 
+//Redirect to https
+app.use((req, res, next) => {
+    const host = process.env.DEBUG ? "localhost:3000" : "caltools.herokuapp.com";
+    if(req.headers.host === host){
+        if(!process.env.DEBUG){
+            //console.log(req.headers);
+            if(!req.secure){
+                //console.log(`https://${req.headers.host}${req.url}`);
+                return res.redirect(`https://${req.headers.host}${req.url}`);
+            }
+            else{ return next(); }
+        }
+        else{
+            return next();
+        }
+    }
+});
+
 //Route includes
 app.use("/api/users", userRouter);
 app.use("/api/organizations", orgRouter);
