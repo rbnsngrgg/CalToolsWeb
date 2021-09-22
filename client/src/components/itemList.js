@@ -44,7 +44,7 @@ const ItemListComponent = (props) => {
     const fetchItems = useCallback(() => {
         clearForm();
         if(!readOnly){ toggleEdit(); }
-        fetch(endpoint + "items/" + document.getElementById("orgSelect").value, {
+        fetch(endpoint + "items/" + userContext.currentOrg, {
           method: "GET",
           credentials: "include",
           // Pass authentication token as bearer token in header
@@ -479,28 +479,20 @@ const ItemListComponent = (props) => {
             fetchItems();
         }
         // eslint-disable-next-line
-        }, [userContext.details, props.fetchUserDetails, items, fetchItems, organizationNames, fetchOrganizationNames]);
+        }, [userContext.details, userContext.currentOrg, props.fetchUserDetails, items, fetchItems, organizationNames, fetchOrganizationNames]);
         
     return (
-        <div className="flex flex-row justify-center content-start h-5/6 w-screen">
-            <div className="h-full mr-4 mb-8 mt-3 w-2/12">
+        <div className="flex flex-col lg:flex-row justify-start items-center lg:justify-center lg:items-start h-full lg:h-5/6 w-screen">
+            <div id="listDiv" className="lg:h-full lg:mr-4 lg:mb-8 mt-3 lg:w-2/12">
                 <input disabled={showTaskDetails} type="text" placeholder="Search" className="w-full mb-1 px-2 border-2 border-gray-400 rounded-lg"/>
                 <select disabled={showTaskDetails} id="itemSelect" name="Items" size="2" className="h-5/6 w-full border-4 border-gray-400 rounded-lg" onChange={selectedItemChanged}>
                     {categories.map(cat => buildItemCategory(cat))}
                 </select>
             </div>
-            <div className="flex flex-col justify-start items-center w-3/5 my-8">
-                <div className="inline-block relative w-64 mt-3">
-                    <select disabled={showTaskDetails} id="orgSelect" onChange={fetchItems} className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-                        {(organizationNames && organizationNames.map((x, i) => <option key={`org${i}`} value={x}>{x}</option>))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 mt-1">
-                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                    </div>
-                </div>
+            <div className="flex flex-col justify-start items-center w-11/12 lg:w-8/12 my-8">
                 <div className="flex flex-col p-2 border-4 border-gray-400 rounded-lg w-full px-4 mt-2 justify-center">
                     <div className="flex w-full items-center justify-center justify-evenly mb-2">
-                        <button id="newItemButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={newItem}>New Item</button>
+                        <button id="newItemButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={newItem}>New</button>
                         <button id="editButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={saveEditButtonClick}>Edit</button>
                         <button disabled={readOnly} id="cancelButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={cancelButtonClick}>Cancel</button>
                         <button disabled={readOnly} id="itemDeleteButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={() => {setDeleteConfirm(true)}}>Delete</button>
@@ -519,19 +511,19 @@ const ItemListComponent = (props) => {
                         </div>
                     }
                     {/* Item details form */}
-                    <form className="grid w-full grid-cols-4 grid-rows-20 gap-y-2" id="itemForm">
+                    <form className="flex flex-col lg:grid w-full lg:grid-cols-4 lg:grid-rows-20 lg:gap-y-2" id="itemForm">
                         <label htmlFor="categoryInput" className="">Item Category:</label>
-                        <input readOnly type="text" id="categoryInput" name="categoryInput" className="col-span-3" placeholder="Ex. Production Equipment"></input>
+                        <input readOnly type="text" id="categoryInput" name="categoryInput" className="col-span-3 rounded-sm" placeholder="Ex. Production Equipment"></input>
                         <label htmlFor="snInput" className="">Serial Number:</label>
-                        <input readOnly type="text" id="snInput" name="snInput" className="col-span-3"></input>
+                        <input readOnly type="text" id="snInput" name="snInput" className="col-span-3 rounded-sm"></input>
                         <label htmlFor="modelInput" className="">Model:</label>
-                        <input readOnly type="text" id="modelInput" name="modelInput" className="col-span-3"></input>
+                        <input readOnly type="text" id="modelInput" name="modelInput" className="col-span-3 rounded-sm"></input>
                         <label htmlFor="descriptionInput" className="">Description:</label>
-                        <input readOnly type="text" id="descriptionInput" name="descriptionInput" className="col-span-3"></input>
+                        <input readOnly type="text" id="descriptionInput" name="descriptionInput" className="col-span-3 rounded-sm"></input>
                         <label htmlFor="locationInput" className="">Location:</label>
-                        <input readOnly type="text" id="locationInput" name="locationInput" className="col-span-3"></input>
+                        <input readOnly type="text" id="locationInput" name="locationInput" className="col-span-3 rounded-sm"></input>
                         <label htmlFor="manufacturerInput" className="">Manufacturer:</label>
-                        <input readOnly type="text" id="manufacturerInput" name="manufacturerInput" className="col-span-3"></input>
+                        <input readOnly type="text" id="manufacturerInput" name="manufacturerInput" className="col-span-3 rounded-sm"></input>
                         <label htmlFor="standardEquipmentInput" className="">Standard Equipment:</label>
                         <input disabled type="checkbox" id="standardEquipmentInput" name="standardEquipmentInput" className="col-span-3 self-center"></input>
                         <label htmlFor="inOperationInput" className="">In Operation:</label>
@@ -539,11 +531,11 @@ const ItemListComponent = (props) => {
                         <label htmlFor="publicInput" className="">Public can read data?</label>
                         <input disabled type="checkbox" id="publicInput" name="publicInput" className="col-span-3 self-center"></input>
                         <label htmlFor="itemGroupInput" className="">Item Group:</label>
-                        <input readOnly type="text" id="itemGroupInput" name="itemGroupInput" className="col-span-3"></input>
+                        <input readOnly type="text" id="itemGroupInput" name="itemGroupInput" className="col-span-3 rounded-sm"></input>
                         <label htmlFor="remarksInput" className="">Remarks:</label>
-                        <textarea readOnly id="remarksInput" name="remarksInput" className="col-span-3 row-span-4"></textarea>
+                        <textarea readOnly id="remarksInput" name="remarksInput" className="col-span-3 row-span-4 rounded-sm"></textarea>
                     </form>
-                    <div className="flex justify-center border-2 border-gray-400 rounded-lg mt-5 pb-5 overflow-auto w-auto">
+                    <div id="tasksTableDiv" className="justify-center border-2 border-gray-400 rounded-lg mt-5 pb-5 overflow-auto w-auto hidden lg:flex">
                         <table className="">
                             <thead>
                                 <tr>
@@ -559,21 +551,21 @@ const ItemListComponent = (props) => {
                             </thead>
                             <tbody>
                                 {currentTasks.map((t,i) => { return(
-                                        <tr>
-                                            <td className="px-2">{t._id}</td>
-                                            <td className="px-2"><input readOnly={readOnly} type="text" id={`task${i}TitleInput`} name={`task${i}TitleInput`} value={t.title}></input></td>
-                                            <td className="px-2"><input disabled={readOnly} type="checkbox" id={`task${i}MandatoryInput`} name={`task${i}MandatoryInput`} checked={t.isMandatory} className="col-span-3 self-center"/></td>
-                                            <td className="px-2"><input readOnly type="date" id={`task${i}CompleteDate`} name={`task${i}CompleteDate`} className="" value={(t.completeDate && t.completeDate.split('T')[0]) || ""}></input></td>
-                                            {/* <td className="px-2">placeholder</td> */}
-                                            {/* <td className="px-2"><input disabled={readOnly} type="checkbox" id={`task${i}DueBox`} name={`task${i}DueBox`} className="col-span-3 self-center"/></td> */}
-                                            <td className="px-2">{t.actionType}</td>
-                                            <td className="px-2"><button id={`task${i}DetailsButton`} onClick={() => {displayTaskDetails(t)}}>...</button></td>
-                                        </tr>
+                                    <tr>
+                                        <td className="px-2">{t._id}</td>
+                                        <td className="px-2"><input readOnly={readOnly} type="text" id={`task${i}TitleInput`} name={`task${i}TitleInput`} value={t.title}></input></td>
+                                        <td className="px-2"><input disabled={readOnly} type="checkbox" id={`task${i}MandatoryInput`} name={`task${i}MandatoryInput`} checked={t.isMandatory} className="col-span-3 self-center"/></td>
+                                        <td className="px-2"><input readOnly type="date" id={`task${i}CompleteDate`} name={`task${i}CompleteDate`} className="" value={(t.completeDate && t.completeDate.split('T')[0]) || ""}></input></td>
+                                        {/* <td className="px-2">placeholder</td> */}
+                                        {/* <td className="px-2"><input disabled={readOnly} type="checkbox" id={`task${i}DueBox`} name={`task${i}DueBox`} className="col-span-3 self-center"/></td> */}
+                                        <td className="px-2">{t.actionType}</td>
+                                        <td className="px-2"><button id={`task${i}DetailsButton`} onClick={() => {displayTaskDetails(t)}}>...</button></td>
+                                    </tr>
                                 )})}
                             </tbody>
                         </table>
                     </div>
-                    <div className="flex w-full items-center justify-center justify-evenly mb-2">
+                    <div className="w-full items-center justify-center justify-evenly mb-2 hidden lg:flex">
                         <button disabled={!selectedItem} id="newTaskButton" className="opacity-100 my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100 disabled:bg-gray-100 disabled:opacity-20" onClick={newTask}>New Task</button>
                     </div>
                 </div>

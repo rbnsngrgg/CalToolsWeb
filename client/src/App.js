@@ -88,9 +88,9 @@ function App() {
   }, [syncLogout])  
 
   return (
-    <div className="App bg-gray-300 h-screen overflow-auto">
+    <div className="flex flex-col App bg-gray-300 h-screen overflow-auto">
       <BrowserRouter>
-        <Router className="h-full">
+        <Router className="h-full flex flex-col">
           <Navbar  fetchUserDetails={fetchUserDetails}/>
           {userContext.token === null ?
           (<>
@@ -110,7 +110,7 @@ function App() {
             <Route exact path="/organization" render={() => (<OrganizationComponent fetchUserDetails={fetchUserDetails}/>)}/>
             <Route exact path="/organization/new" render={() => (<NewOrganizationComponent fetchUserDetails={fetchUserDetails}/>)}/>
             <Route exact path="/users/me/profile" render={() => (<ProfileComponent fetchUserDetails={fetchUserDetails}/>)}/>
-            <Route exact path="/item/:organization/:item" component={SingleItemPage}/>
+            <Route exact path="/i/:organization/:item" component={SingleItemPage}/>
             <Route><Redirect to="/"/></Route>
             </Switch>
             </>)
