@@ -31,7 +31,6 @@ const ItemListComponent = (props) => {
     const [items, setItems] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
     const [categories, setCategories] = useState([]);
-    const [organizationNames, setOrganizationNames] = useState(null);
     const [readOnly, setReadOnly] = useState(true);
     const [taskReadOnly, setTaskReadOnly] = useState(true);
     const [currentTasks, setCurrentTasks] = useState([]);
@@ -229,24 +228,7 @@ const ItemListComponent = (props) => {
             }
         });
     }
-  
-    const fetchOrganizationNames = useCallback(() => {
-        fetch(endpoint + "users/me/organizations", {
-            method: "GET",
-            credentials: "include",
-            // Pass authentication token as bearer token in header
-            headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userContext.token}`,
-            }
-        })
-        .then(async response => {
-            if (response.ok) {
-            let data = await response.json();
-            setOrganizationNames(data);
-            }});
-    }, [userContext.token, setOrganizationNames, endpoint]);
-    
+      
     const deleteItem = useCallback(() => {
         fetch(endpoint + "items/delete", {
             method: "POST",
@@ -472,14 +454,11 @@ const ItemListComponent = (props) => {
         if (!userContext.details) {
             props.fetchUserDetails();
         }
-        if(!organizationNames){
-            fetchOrganizationNames();
-        }
-        if(!items && organizationNames){
+        if(!items && userContext.currentOrg){
             fetchItems();
         }
         // eslint-disable-next-line
-        }, [userContext.details, userContext.currentOrg, props.fetchUserDetails, items, fetchItems, organizationNames, fetchOrganizationNames]);
+        }, [userContext.details, userContext.currentOrg, props.fetchUserDetails, items, fetchItems]);
         
     return (
         <div className="flex flex-col lg:flex-row justify-start items-center lg:justify-center lg:items-start h-full lg:h-5/6 w-screen">
@@ -489,7 +468,7 @@ const ItemListComponent = (props) => {
                     {categories.map(cat => buildItemCategory(cat))}
                 </select>
             </div>
-            <div className="flex flex-col justify-start items-center w-11/12 lg:w-8/12 my-8">
+            <div className="flex flex-col justify-start items-center w-11/12 lg:w-8/12 mt-8 mb-4">
                 <div className="flex flex-col p-2 border-4 border-gray-400 rounded-lg w-full px-4 mt-2 justify-center">
                     <div className="flex w-full items-center justify-center justify-evenly mb-2">
                         <button id="newItemButton" className="my-2 border-2 border-gray-400 rounded-md w-1/6 hover:bg-gray-100" onClick={newItem}>New</button>
@@ -702,8 +681,20 @@ const ItemListComponent = (props) => {
                             </div>
                         </form>
                     </div>
-            }
-            </div>
+                }
+                </div>
+            <hr className="lg:hidden border-2 border-gray-200 rounded-md w-11/12 mb-4"></hr>
+            {<div className="flex lg:hidden flex-col justify-start items-center w-11/12 mb-4 ">
+                <div className="flex flex-col p-2 border-4 border-gray-400 rounded-lg w-full px-4 justify-center">
+                    <div id="taskButtonContainer" className="h-11/12 w-full flex flex-col">
+                        <button className="grid grid-cols-2 grid-rows-2 w-full border-2 border-gray-200 rounded-sm">
+                            <h3>Title</h3>
+                            <h3>Due Date</h3>
+                            <h3>Interval</h3>
+                        </button>
+                    </div>
+                </div>
+            </div>}
         </div>
     )
 }

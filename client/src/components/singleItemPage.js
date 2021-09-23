@@ -71,7 +71,7 @@ const SingleItemPage = () => {
             fetchItemDetails();
         }
         // eslint-disable-next-line
-    },[dataPresent]);
+    },[dataPresent, item, organization]);
 
     return(
         <div className="flex flex-col w-full justify-center items-center">
